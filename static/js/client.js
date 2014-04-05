@@ -9,11 +9,8 @@ window.onload = function() {
     socket.on('message', function (data) {
         if(data.message) {
             messages.push(data.message);
-            var html = '';
-            for(var i=0; i<messages.length; i++) {
-                html += messages[i] + '<br />';
-            }
-            content.innerHTML = html;
+            messageURL = data.message + "<i>" + (Date.now() - data.timestamp) + " ms</i><br/>";
+            content.innerHTML = content.innerHTML + messageURL;
         } else {
             console.log("There is a problem:", data);
         }
@@ -21,7 +18,7 @@ window.onload = function() {
 
     sendButton.onclick = function() {
         var text = field.value;
-        socket.emit('send', { message: text });
+        socket.emit('send', { message: text, timestamp: Date.now() });
     };
 
 }

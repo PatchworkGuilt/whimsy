@@ -4,7 +4,8 @@
     "description": "Collaborative Playground",
     "dependencies": {
         "socket.io": "latest",
-        "express": "latest"
+        "express": "latest",
+        "jade": "latest"
     },
     "author": "Scott Morse"
 }

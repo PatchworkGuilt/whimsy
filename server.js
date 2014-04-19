@@ -10,7 +10,7 @@ app.get("/", function(req, res){
     res.render("index");
 });
 
-app.use(express.static(__dirname + '/static/js'));
+app.use(express.static(__dirname + '/static/'));
 
 var io = require('socket.io').listen(app.listen(port));
 io.set('log level', 2);

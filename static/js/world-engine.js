@@ -24,30 +24,28 @@ function getBodyJSON(body){
 
 function getWorldJSON(){
     var worldJSON = []
-    for(var i=0; i<this._bodies.length; i++)
+    this._bodies.forEach(function(body)
     {
-        var body = this._bodies[i];
         worldJSON.push(getBodyJSON(body));
-    }
+    });
     return JSON.stringify(worldJSON);
 };
 
 function createWorld(world){
-    var ball = Physics.body('circle', {
-        x: 50,
-        y: 30,
-        vx: 1.0, // velocity in x-direction
-        vy: 0, // velocity in y-direction
-        radius: 20
+    var worldData = require('../JSON/world.json')
+    worldData.bodies.forEach(function(body){
+        world.add(Physics.body(body.type, body.args))
     });
-    world.add( ball );
-    world.add( Physics.behavior('constant-acceleration') );
-    var bounds = Physics.aabb(0, 0, 500, 500);
-    world.add( Physics.behavior('edge-collision-detection', {
-        aabb: bounds
-    }) );
-    // ensure objects bounce when edge collision is detected
-    world.add( Physics.behavior('body-impulse-response') );
+    worldData.behaviors.forEach(function(behavior){
+        var args;
+        if(behavior.args && behavior.args.aabb)
+            args = {'aabb': Physics.aabb.apply(this, behavior.args.aabb)}
+        if(args)
+            world.add( Physics.behavior(behavior.type, args))
+        else
+            world.add( Physics.behavior(behavior.type))
+    });
+
     world.toJSON = getWorldJSON;
     world.eventEmitter = new events.EventEmitter;
     var totalTime = 0;

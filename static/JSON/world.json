@@ -1,0 +1,42 @@
+{
+    "id": "world1",
+    "height": 800,
+    "width": 800,
+    "bodies": [
+        {
+            "type": "circle",
+            "args": {
+                "x": 50,
+                "y": 30,
+                "vx": 1.0,
+                "vy": 0,
+                "radius": 20
+            }
+        },
+        {
+            "type": "circle",
+            "args": {
+                "x": 20,
+                "y": 30,
+                "vx": 1.0,
+                "vy": 0,
+                "radius": 10
+            }
+        }
+    ],
+    "behaviors": [
+        {
+            "type": "constant-acceleration"
+        },
+        {
+            "type": "edge-collision-detection",
+            "args": {
+                "aabb": [0,0,800,800]
+            }
+        },
+        {
+            "type": "body-impulse-response"
+        }
+    ]
+
+}

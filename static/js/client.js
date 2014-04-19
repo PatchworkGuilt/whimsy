@@ -1,24 +1,12 @@
 window.onload = function() {
-
     var messages = [];
     var socket = io.connect(document.URL);
-    var field = document.getElementById("field");
-    var sendButton = document.getElementById("send");
-    var content = document.getElementById("content");
-
+    var paper = Raphael('viewport', 800, 800);
     socket.on('message', function (data) {
-        if(data.message) {
-            messages.push(data.message);
-            messageURL = data.message + "<i>" + (Date.now() - data.timestamp) + " ms</i><br/>";
-            content.innerHTML = content.innerHTML + messageURL;
-        } else {
-            console.log("There is a problem:", data);
-        }
+        paper.clear();
+        var worldBodies = JSON.parse(data);
+        worldBodies.forEach(function(body){
+            paper.circle(body['x'], body['y'], body['radius']);
+        });
     });
-
-    sendButton.onclick = function() {
-        var text = field.value;
-        socket.emit('send', { message: text, timestamp: Date.now() });
-    };
-
 }

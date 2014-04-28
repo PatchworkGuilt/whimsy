@@ -1,6 +1,6 @@
 {
     "id": "world1",
-    "height": 800,
+    "height": 400,
     "width": 800,
     "bodies": [
         {
@@ -31,7 +31,7 @@
         {
             "type": "edge-collision-detection",
             "args": {
-                "aabb": [0,0,800,800]
+                "aabb": [0,0,800,400]
             }
         },
         {

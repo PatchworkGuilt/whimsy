@@ -18,7 +18,7 @@ function getBodyJSON(body){
     return {
         x: body.state.pos._[0],
         y: body.state.pos._[1],
-        radius: body.options.radius
+        radius: body.radius
     }
 };
 
@@ -50,8 +50,8 @@ function createWorld(world){
     world.eventEmitter = new events.EventEmitter;
     var totalTime = 0;
     setInterval(function(){
-        world.step( totalTime );
         totalTime += timestep;
+        world.step( totalTime );
         world.eventEmitter.emit('tick');
     }, timestep);
 };

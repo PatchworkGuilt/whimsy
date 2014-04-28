@@ -1,4 +1,4 @@
-var Physics = require('physicsjs');
+var Physics = require('PhysicsJS');
 var events = require('events');
 
 var FPS = 120.0;

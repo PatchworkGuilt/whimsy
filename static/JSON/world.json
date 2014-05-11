@@ -31,7 +31,8 @@
         {
             "type": "edge-collision-detection",
             "args": {
-                "aabb": [0,0,800,400]
+                "aabb": [0,0,800,400],
+                "restitution": 0.9
             }
         },
         {

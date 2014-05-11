@@ -7,6 +7,7 @@
         "express": "latest",
         "jade": "latest",
         "requirejs": "latest",
+        "amdefine": "latest",
         "PhysicsJS": "git://github.com/wellcaffeinated/PhysicsJS.git"
     },
     "author": "Scott Morse"

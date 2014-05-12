@@ -23,7 +23,6 @@ require([
     });
 
     $('#viewport').click(function(event){
-        paper.circle(event.offsetX, event.offsetY, 10);
         eventData = {
             type: 'circle',
             x: event.offsetX,

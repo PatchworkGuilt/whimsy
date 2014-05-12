@@ -44,10 +44,18 @@ define(['PhysicsJS', '../JSON/world.json'], function(Physics, worldData) {
                     world.add( Physics.behavior(behavior.type))
             });
 
+            world.on('addBody', function(object){
+                var body = Physics.body(object.type, {x: object.x, y: object.y, radius: object.radius});
+                world.add(body);
+            });
             setInterval(function(){
                 worldPhysics.step( Date.now() );
                 render(room_id, toJSON());
             }, timestep);
+
+        };
+        this.emit = function(name, data){
+            worldPhysics.emit(name, data);
         };
     }
     return constructor;

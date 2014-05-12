@@ -1,7 +1,7 @@
 if (typeof define !== 'function') {
     var define = require('amdefine')(module);
 }
-define(['PhysicsJS', '../JSON/world.json'], function(Physics, worldData) {
+define(['PhysicsJS', '../JSON/world.json', 'static/js/util/StopWatch'], function(Physics, worldData, StopWatch) {
     var constructor = function WorldEngine(timestep, render, room_id)
     {
         var worldPhysics = Physics({
@@ -48,9 +48,12 @@ define(['PhysicsJS', '../JSON/world.json'], function(Physics, worldData) {
                 var body = Physics.body(object.type, {x: object.x, y: object.y, radius: object.radius});
                 world.add(body);
             });
+            var stopwatch = new StopWatch('step&render', 600);
             setInterval(function(){
+                stopwatch.startClock();
                 worldPhysics.step( Date.now() );
                 render(room_id, toJSON());
+                stopwatch.stopClock();
             }, timestep);
 
         };

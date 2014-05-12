@@ -2,8 +2,6 @@ html
     head
         title= "Real time web chat"
         link(rel="stylesheet" type="text/css" href="/css/main.css")
-        script(src='/js/client.js')
-        script(src='/js/third-party/raphael-2.1.2.js')
-        script(src='/socket.io/socket.io.js')
+        script(data-main='/js/client' src="/js/third-party/require.js")
     body
         div(id="viewport")

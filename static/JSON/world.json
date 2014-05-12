@@ -32,11 +32,17 @@
             "type": "edge-collision-detection",
             "args": {
                 "aabb": [0,0,800,400],
-                "restitution": 0.9
+                "restitution": 0.3
             }
         },
         {
             "type": "body-impulse-response"
+        },
+        {
+            "type": "body-collision-detection"
+        },
+        {
+            "type": "sweep-prune"
         }
     ]
 

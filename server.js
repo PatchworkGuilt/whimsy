@@ -29,6 +29,11 @@ requirejs(['./static/js/WorldEngine', 'static/js/util/StopWatch'], function(Worl
         socket.join(room_id);
         if(!world)
             world = new WorldEngine(timestep, renderWorld, room_id);
+        socket.world = world;
+
+        socket.on('add', function(data){
+            socket.world.emit('addBody', data);
+        });
     });
 });
 console.log("Listening on port " + port);

@@ -12,6 +12,7 @@ require([
     'jquery'
 ], function(Raphael, io, $)
 {
+    var numFrames = 0;
     var socket = io.connect(document.URL);
     var paper = Raphael('viewport', 800, 400);
     socket.on('render', function (data) {
@@ -20,6 +21,7 @@ require([
         worldBodies.forEach(function(body){
             paper.circle(body['x'], body['y'], body['radius']);
         });
+        numFrames++;
     });
 
     $('#viewport').click(function(event){
@@ -32,6 +34,10 @@ require([
         socket.emit('add', eventData);
     })
 
+    setInterval(function(){
+        console.log( (numFrames/10) + ' per second');
+        numFrames = 0;
+    },10000)
     socket.on('disconnect', function () {
         console.log("What happen?");
     });

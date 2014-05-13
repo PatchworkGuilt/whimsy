@@ -1,7 +1,7 @@
 var express = require("express");
 var requirejs = require("requirejs");
 var app = express();
-var port = 3700;
+var port = process.env.PORT || 3700;
 
 app.set('views', __dirname + '/static/jade');
 app.set('view engine', "jade");

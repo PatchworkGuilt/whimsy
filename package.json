@@ -1,14 +1,33 @@
 {
-    "name": "Whimsy",
-    "version": "0.0.0",
-    "description": "Collaborative Playground",
-    "dependencies": {
-        "socket.io": "latest",
-        "express": "latest",
-        "jade": "latest",
-        "requirejs": "latest",
-        "amdefine": "latest",
-        "PhysicsJS": "git://github.com/wellcaffeinated/PhysicsJS.git"
-    },
-    "author": "Scott Morse"
+  "name": "Whimsy",
+  "version": "0.0.0",
+  "description": "Collaborative Playground",
+  "dependencies": {
+    "socket.io": "latest",
+    "express": "latest",
+    "jade": "latest",
+    "requirejs": "latest",
+    "amdefine": "latest",
+    "PhysicsJS": "git://github.com/wellcaffeinated/PhysicsJS.git"
+  },
+  "author": "Scott Morse",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "main": "server.js",
+  "devDependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/PatchworkGuilt/whimsy.git"
+  },
+  "keywords": [
+    "online",
+    "creative",
+    "playground"
+  ],
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/PatchworkGuilt/whimsy/issues"
+  },
+  "homepage": "https://github.com/PatchworkGuilt/whimsy"
 }

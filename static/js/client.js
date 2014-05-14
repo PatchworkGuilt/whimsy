@@ -35,7 +35,6 @@ require([
             radius: Math.floor(Math.random()*20)
         };
         socket.emit('add', eventData);
-        console.log(eventData.radius);
     })
 
     socket.on('disconnect', function () {

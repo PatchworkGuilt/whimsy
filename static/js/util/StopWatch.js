@@ -6,6 +6,7 @@ define( function() {
         var numMeasurements = 0;
         var startTime;
 
+        var numFrames = 0;
         this.startClock = function(){
             startTime = Date.now();
         }
@@ -23,6 +24,18 @@ define( function() {
             elapsedTime = 0;
             numMeasurements = 0;
         }
+
+        this.tickFrame = function(){
+            numFrames++;
+        }
+
+        this.logFPS = function(interval){
+            setInterval(function(){
+                console.log( (numFrames/10) + ' per second');
+                numFrames = 0;
+            }, interval || 10000);
+        }
+
     }
     return constructor;
 });

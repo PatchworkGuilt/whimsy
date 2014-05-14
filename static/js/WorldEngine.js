@@ -47,6 +47,7 @@ define(['PhysicsJS', '../JSON/world.json', 'static/js/util/StopWatch'], function
             world.on('addBody', function(object){
                 var body = Physics.body(object.type, {x: object.x, y: object.y, radius: object.radius});
                 world.add(body);
+                console.log(worldPhysics._bodies.length + " bodies.")
             });
             var stopwatch = new StopWatch('step&render', 600);
             setInterval(function(){

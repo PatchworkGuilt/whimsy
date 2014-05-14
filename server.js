@@ -20,9 +20,11 @@ requirejs(['./static/js/WorldEngine', 'static/js/util/StopWatch'], function(Worl
     var io = require('socket.io').listen(app.listen(port));
     io.set('log level', 2);
     var world;
-
+    var stopwatch = new StopWatch();
+    stopwatch.logFPS();
     function renderWorld(roomID, worldData){
-        io.sockets.in(roomID).emit('render', worldData);
+        stopwatch.tickFrame();
+        io.sockets.in(roomID).volatile.emit('render', worldData);
     };
 
     io.sockets.on('connection', function (socket) {

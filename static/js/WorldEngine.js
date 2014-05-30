@@ -1,9 +1,41 @@
 if (typeof define !== 'function') {
     var define = require('amdefine')(module);
 }
-define(['PhysicsJS', '../JSON/world.json', 'static/js/util/StopWatch'], function(Physics, worldData, StopWatch) {
-    var constructor = function WorldEngine(timestep, render, room_id)
+define(['PhysicsJS', 'js/util/StopWatch'], function(Physics, StopWatch) {
+    var constructor = function(render, room_id)
     {
+        var FPS = 60.0;
+        var timestep = 1000 / FPS;
+
+        //BECAUSE I NO HAVE DB YET
+        var worldData = {
+            "id": "world1",
+            "height": 400,
+            "width": 800,
+            'bodies': [],
+            "behaviors": [
+                {
+                    "type": "constant-acceleration"
+                },
+                {
+                    "type": "edge-collision-detection",
+                    "args": {
+                        "aabb": [0,0,800,400],
+                        "restitution": 0.3
+                    }
+                },
+                {
+                    "type": "body-impulse-response"
+                },
+                {
+                    "type": "body-collision-detection"
+                },
+                {
+                    "type": "sweep-prune"
+                }
+            ]
+        };
+
         var worldPhysics = Physics({
             // maximum number of iterations per step
             maxIPF: 320,
@@ -48,6 +80,9 @@ define(['PhysicsJS', '../JSON/world.json', 'static/js/util/StopWatch'], function
                 var body = Physics.body(object.type, {x: object.x, y: object.y, radius: object.radius});
                 world.add(body);
             });
+        };
+
+        this.start = function() {
             var stopwatch = new StopWatch('step&render', 600);
             setInterval(function(){
                 stopwatch.startClock();
@@ -55,8 +90,8 @@ define(['PhysicsJS', '../JSON/world.json', 'static/js/util/StopWatch'], function
                 render(room_id, toJSON());
                 stopwatch.stopClock();
             }, timestep);
+        }
 
-        };
         this.emit = function(name, data){
             worldPhysics.emit(name, data);
         };

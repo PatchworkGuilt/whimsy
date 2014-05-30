@@ -3,19 +3,22 @@
   "version": "0.0.0",
   "description": "Collaborative Playground",
   "dependencies": {
-    "socket.io": "latest",
+    "PhysicsJS": "git://github.com/wellcaffeinated/PhysicsJS.git",
+    "amdefine": "latest",
     "express": "latest",
     "jade": "latest",
     "requirejs": "latest",
-    "amdefine": "latest",
-    "PhysicsJS": "git://github.com/wellcaffeinated/PhysicsJS.git"
+    "socket.io": "latest"
   },
   "author": "Scott Morse",
   "scripts": {
-    "start": "node server.js"
+    "start": "node server.js",
+    "test": "mocha"
   },
   "main": "server.js",
-  "devDependencies": {},
+  "devDependencies": {
+    "mocha": "^1.19.0"
+    },
   "repository": {
     "type": "git",
     "url": "git://github.com/PatchworkGuilt/whimsy.git"

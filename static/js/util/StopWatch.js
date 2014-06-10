@@ -1,3 +1,7 @@
+if (typeof define !== 'function') {
+    var define = require('amdefine')(module);
+}
+
 define( function() {
     var constructor = function StopWatch(name, logEveryN) {
         this.name = name;
@@ -30,10 +34,11 @@ define( function() {
         }
 
         this.logFPS = function(interval){
+            interval = interval || 10000;
             setInterval(function(){
-                console.log( (numFrames/10) + ' per second');
+                console.log( (numFrames/(interval * 1000)) + ' per second');
                 numFrames = 0;
-            }, interval || 10000);
+            }, interval);
         }
 
     }

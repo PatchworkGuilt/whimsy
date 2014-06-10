@@ -3,22 +3,24 @@ requirejs.config({
       "jquery": "third-party/jquery-1.11.1.min",
       'raphael': 'third-party/raphael-2.1.2',
       'socketio': '/socket.io/socket.io.js',
-      'stopwatch': 'util/StopWatch'
+      'stopwatch': './util/StopWatch',
+      'worldManager': 'worldManager'
     }
 });
 
 require([
     'raphael',
-    'socketio',
     'jquery',
-    'stopwatch'
-], function(Raphael, io, $, StopWatch)
+    'stopwatch',
+    'worldManager'
+], function(Raphael, $, StopWatch, worldManager)
 {
-    var socket = io.connect(document.URL);
     var paper = Raphael('viewport', 800, 400);
+    //worldManager.runOnServer();
+    worldManager.runLocally();
     var stopwatch = new StopWatch();
-    stopwatch.logFPS();
-    socket.on('render', function (data) {
+    //stopwatch.logFPS();
+    worldManager.setRender(function (data) {
         paper.clear();
         var worldBodies = JSON.parse(data);
         worldBodies.forEach(function(body){
@@ -34,16 +36,20 @@ require([
             y: event.offsetY,
             radius: Math.floor(Math.random()*20)
         };
-        socket.emit('add', eventData);
+        worldManager.add(eventData);
     })
 
-    socket.on('disconnect', function () {
-        console.log("What happen?");
-    });
-    socket.on('reconnecting', function () {
-        console.log("Come back!");
-    });
-    socket.on('reconnect_failed', function () {
-        console.log("Fuck.");
-    });
+    $("#toggleControl").click(function(event){
+        if(worldManager.isRunningLocally())
+        {
+            worldManager.runOnServer();
+            $("#toggleControl").html("Run Locally");
+        }
+        else
+        {
+            worldManager.runLocally();
+            $("#toggleControl").html("Run On Server");
+        }
+    })
+
 });

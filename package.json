@@ -5,20 +5,27 @@
   "dependencies": {
     "PhysicsJS": "git://github.com/wellcaffeinated/PhysicsJS.git",
     "amdefine": "latest",
+    "casperjs": "^1.1.0-beta3",
     "express": "latest",
     "jade": "latest",
+    "phantomjs": "^1.9.7-8",
     "requirejs": "latest",
     "socket.io": "latest"
   },
   "author": "Scott Morse",
   "scripts": {
     "start": "node server.js",
-    "test": "mocha"
+    "2test": "mocha static/js/test/ --reporter spec --recursive",
+    "test": "casperjs test static/js/test/client_test.js"
   },
   "main": "server.js",
   "devDependencies": {
-    "mocha": "^1.19.0"
-    },
+    "chai": "^1.9.1",
+    "mocha": "^1.19.0",
+    "squirejs": "^0.2.0",
+    "casperjs": "^1.1.0-beta3",
+    "zombie": "^2.0.0-alpha31"
+  },
   "repository": {
     "type": "git",
     "url": "git://github.com/PatchworkGuilt/whimsy.git"

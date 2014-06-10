@@ -4,7 +4,7 @@ var app = express();
 var port = process.env.PORT || 3700;
 
 requirejs.config({
-    baseUrl: './static',
+    baseUrl: './static/js',
     nodeRequire: require,
 });
 
@@ -19,27 +19,28 @@ app.use(express.static(__dirname + '/static/'));
 
 var room_id = "room1"; //Temporary, obviously
 
-requirejs(['js/WorldEngine', 'js/util/StopWatch'], function(WorldEngine, StopWatch) {
+requirejs(['World', './util/StopWatch'], function(World, StopWatch) {
     var io = require('socket.io').listen(app.listen(port));
-    io.set('log level', 2);
+    //io.set('log level', 2);
     var world;
     var stopwatch = new StopWatch();
-    stopwatch.logFPS();
-    function renderWorld(roomID, worldData){
-        stopwatch.tickFrame();
-        io.sockets.in(roomID).volatile.emit('render', worldData);
-    };
+    //stopwatch.logFPS();
 
     io.sockets.on('connection', function (socket) {
+        function renderWorld(worldData){
+            stopwatch.tickFrame();
+            socket.broadcast.to(room_id).volatile.emit('render', worldData);
+        };
         socket.join(room_id);
         if(!world)
         {
-            world = new WorldEngine(renderWorld, room_id);
+            world = new World(renderWorld, room_id);
             world.start();
         }
         socket.world = world;
 
         socket.on('add', function(data){
+            console.log("add", data);
             socket.world.emit('addBody', data);
         });
     });

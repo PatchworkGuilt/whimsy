@@ -12,7 +12,7 @@ var injector = new Squire();
 describe('World', function(){
     it('like, works and stuff', function(){
         injector.mock('util/StopWatch', {})
-        .require([__dirname + '/../World.js'], function(World){
+        .require([__dirname + '/../../World.js'], function(World){
             var render = function(){};
             var world = new World(render, 'abc');
             assert(world.start);

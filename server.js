@@ -39,7 +39,7 @@ requirejs(['World', './util/StopWatch'], function(World, StopWatch) {
         }
         socket.world = world;
 
-        socket.on('add', function(data){
+        socket.on('addBody', function(data){
             console.log("add", data);
             socket.world.emit('addBody', data);
         });

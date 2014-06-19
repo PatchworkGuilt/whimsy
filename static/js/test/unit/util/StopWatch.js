@@ -4,7 +4,7 @@ var requirejs = require("requirejs");
 if (typeof define !== 'function') {
     var define = require('amdefine')(module);
 }
-define(['../../util/StopWatch'], function(StopWatch){
+define(['../../../util/StopWatch'], function(StopWatch){
     describe('StopWatch', function(){
         it("initializes its values", function(){
             var stopwatch = new StopWatch("test", 100);

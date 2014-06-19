@@ -4,7 +4,7 @@ requirejs.config({
       'raphael': 'third-party/raphael-2.1.2',
       'socketio': '/socket.io/socket.io.js',
       'stopwatch': './util/StopWatch',
-      'worldManager': 'worldManager'
+      'worldProxy': 'worldProxy'
     }
 });
 
@@ -12,22 +12,22 @@ require([
     'raphael',
     'jquery',
     'stopwatch',
-    'worldManager'
-], function(Raphael, $, StopWatch, worldManager)
+    'worldProxy'
+], function(Raphael, $, StopWatch, worldProxy)
 {
     var paper = Raphael('viewport', 800, 400);
-    //worldManager.runOnServer();
-    worldManager.runLocally();
-    var stopwatch = new StopWatch();
-    //stopwatch.logFPS();
-    worldManager.setRender(function (data) {
+    function render(data) {
         paper.clear();
         var worldBodies = JSON.parse(data);
         worldBodies.forEach(function(body){
             paper.circle(body['x'], body['y'], body['radius']);
         });
         stopwatch.tickFrame();
-    });
+    };
+
+    worldProxy.init(render);
+    var stopwatch = new StopWatch();
+    //stopwatch.logFPS();
 
     $('#viewport').click(function(event){
         eventData = {
@@ -36,18 +36,18 @@ require([
             y: event.offsetY,
             radius: Math.floor(Math.random()*20)
         };
-        worldManager.add(eventData);
+        worldProxy.add(eventData);
     })
 
     $("#toggleControl").click(function(event){
-        if(worldManager.isRunningLocally())
+        if(worldProxy.isRunningLocally())
         {
-            worldManager.runOnServer();
+            worldProxy.runOnServer();
             $("#toggleControl").html("Run Locally");
         }
         else
         {
-            worldManager.runLocally();
+            worldProxy.runLocally();
             $("#toggleControl").html("Run On Server");
         }
     })

@@ -8,11 +8,11 @@ requirejs.config({
     nodeRequire: require,
 });
 
-app.set('views', __dirname + '/static/jade');
-app.set('view engine', "jade");
-app.engine('jade', require('jade').__express);
+app.set('views', __dirname + '/static/html');
+//app.set('view engine', "ejs");
+app.engine('html', require('ejs').renderFile);
 app.get("/", function(req, res){
-    res.render("index");
+    res.render("index.html");
 });
 
 app.use(express.static(__dirname + '/static/'));
@@ -33,10 +33,8 @@ requirejs(['World', './util/StopWatch'], function(World, StopWatch) {
         };
         socket.join(room_id);
         if(!world)
-        {
             world = new World(renderWorld, room_id);
-            world.start();
-        }
+
         socket.world = world;
 
         socket.on('addBody', function(data){

@@ -1,4 +1,4 @@
-var assert = require("assert");
+var assert = require("chai").assert;
 var requirejs = require("requirejs");
 
 if (typeof define !== 'function') {

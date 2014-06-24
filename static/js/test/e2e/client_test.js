@@ -18,7 +18,7 @@ casper.test.begin("Sandbox page opens and runs", 5, function suite(test){
             test.assertEquals(numCircles, 1, "After clicking svg, there is one circle");
         });
         casper.then(function(){
-            this.click("#toggleControl");
+            this.click("input[value='server']");
         })
         casper.then(function(){
             var numCircles = document.querySelectorAll("circle").length;

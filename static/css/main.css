@@ -1,4 +1,6 @@
 #viewport {
     border: 2px solid grey;
     display: inline-block;
+    height: 400px;
+    width: 800px;
 }

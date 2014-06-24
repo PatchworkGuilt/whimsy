@@ -12,15 +12,17 @@ require([
     'raphael',
     'jquery',
     'stopwatch',
-    'worldProxy'
-], function(Raphael, $, StopWatch, worldProxy)
+    'worldProxy',
+    'boxOfThings'
+], function(Raphael, $, StopWatch, worldProxy, boxOfThings)
 {
-    var paper = Raphael('viewport', 800, 400);
+    var shapeType = "circle";
+    var paper = Raphael('viewport', "100%", "100%");
     function render(data) {
         paper.clear();
         var worldBodies = JSON.parse(data);
         worldBodies.forEach(function(body){
-            paper.circle(body['x'], body['y'], body['radius']);
+            boxOfThings.drawThing(body, paper);
         });
         stopwatch.tickFrame();
     };
@@ -30,26 +32,19 @@ require([
     //stopwatch.logFPS();
 
     $('#viewport').click(function(event){
-        eventData = {
-            type: 'circle',
-            x: event.offsetX,
-            y: event.offsetY,
-            radius: Math.floor(Math.random()*20)
-        };
-        worldProxy.add(eventData);
+        var circle = boxOfThings.getThing(shapeType, event.offsetX, event.offsetY);
+        worldProxy.add(circle);
     })
 
-    $("#toggleControl").click(function(event){
-        if(worldProxy.isRunningLocally())
-        {
+    $("input[name=toggleControl]").change(function(event){
+        var value = event.target.value;
+        if(value == "server")
             worldProxy.runOnServer();
-            $("#toggleControl").html("Run Locally");
-        }
-        else
-        {
+        else if(value == "local")
             worldProxy.runLocally();
-            $("#toggleControl").html("Run On Server");
-        }
-    })
+    });
 
+    $("input[name=shapeType]").change(function(event){
+        shapeType = event.target.value;
+    });
 });

@@ -5,6 +5,7 @@
   "dependencies": {
     "PhysicsJS": "git://github.com/wellcaffeinated/PhysicsJS.git",
     "amdefine": "latest",
+    "ejs": "^1.0.0",
     "express": "latest",
     "jade": "latest",
     "requirejs": "latest",

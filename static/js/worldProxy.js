@@ -6,6 +6,7 @@ define(['World', 'socketio'], function(World, socketio){
     var proxy;
     var serverURL;
     var renderCallback;
+    var runningLocally;
 
     //Using this redirection allows us to asynchronously change where we
     //handle the 'render' by changing renderCallback
@@ -34,17 +35,16 @@ define(['World', 'socketio'], function(World, socketio){
         if(proxy && proxy.removeListener)
             proxy.removeListener("render");
         proxy = new World(render, "room1");
-        proxy.start();
+        runningLocally = true;
     }
 
     function runOnServer() {
-        if(proxy && proxy.stop)
-            proxy.stop();
         proxy = initSocket();
+        runningLocally = false;
     }
 
     function isRunningLocally(){
-        if(proxy && proxy.stop)
+        if(runningLocally === true || typeof runningLocally === "undefined")
             return true;
         else
             return false;

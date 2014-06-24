@@ -40,11 +40,11 @@ describe('worldProxy', function(){
     });
 
     it("can switch between running locally and on server", function(){
-        assert(worldProxy.isRunningLocally());
+        assert.isTrue(worldProxy.isRunningLocally());
         worldProxy.runOnServer();
-        assert.equal(worldProxy.isRunningLocally(), false);
+        assert.isFalse(worldProxy.isRunningLocally());
         worldProxy.runLocally();
-        assert(worldProxy.isRunningLocally());
+        assert.isTrue(worldProxy.isRunningLocally());
     });
 
     describe("init", function(){
@@ -60,6 +60,7 @@ describe('worldProxy', function(){
 
     describe("runLocally", function(){
         it("removes a render listener", function(done){
+            worldProxy.runOnServer();
             var mockProxy = {
                 removeListener: function(name){
                     assert.equal(name, "render");
@@ -77,16 +78,6 @@ describe('worldProxy', function(){
     });
 
     describe("runOnServer", function(){
-        it("stops the proxy world if it has a stop method", function(done){
-            var mockProxy = {
-                stop: function(){
-                    done();
-                }
-            }
-            worldProxy.setProxy(mockProxy);
-            worldProxy.runOnServer();
-        })
-
         it("sets proxy to a socket object", function(){
             worldProxy.runOnServer();
             assert.equal(worldProxy.getProxy(), SocketMock);

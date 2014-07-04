@@ -9,11 +9,11 @@ define(function() {
                     type: "circle",
                     x: x,
                     y: y,
-                    radius: Math.floor(Math.random()*20)
+                    radius: Math.floor(Math.random()*20 + 1)
                 }
             },
             draw: function(thing, paper) {
-                paper.circle(thing.x, thing.y, thing.radius);
+                return paper.circle(thing.x, thing.y, thing.radius);
             }
         },
         rect: {
@@ -27,7 +27,7 @@ define(function() {
                 }
             },
             draw: function(thing, paper) {
-                paper.rect(thing.x, thing.y, thing.width, thing.height);
+                return paper.rect(thing.x, thing.y, thing.width, thing.height);
             }
         }
     }
@@ -36,7 +36,7 @@ define(function() {
             return new things[thingName].init(x, y);
         },
         drawThing: function(thing, paper){
-            things[thing.type].draw(thing, paper);
+            return things[thing.type].draw(thing, paper);
         }
     }
 });

@@ -12,15 +12,13 @@ var injector = new Squire();
 describe('worldProxy', function(){
     var worldProxy;
 
-    var WorldMock = function(render, room){
-        this.render = render;
+    var WorldMock = function(broadcast, room){
+        this.broadcast = broadcast;
         this.room = room;
-        this.stop = function(){};
-        this.start = function(){};
     }
     var SocketMock = {
-            on: function(){}
-        }
+        on: function(){}
+    }
 
     before(function(){
         injector.mock('World', WorldMock)
@@ -48,12 +46,12 @@ describe('worldProxy', function(){
     });
 
     describe("init", function(){
-        it("creates a world with given render function and a room id", function(){
-            function render(){
-                this.name = "testRender";
+        it("creates a world with given broadcast function and a room id", function(){
+            function broadcast(){
+                this.name = "testbroadcast";
             }
-            worldProxy.init(render);
-            assert.equal(render.name, worldProxy.getProxy().render.name);
+            worldProxy.init(broadcast);
+            assert.equal(broadcast.name, worldProxy.getProxy().broadcast.name);
             assert.isString(worldProxy.getProxy().room);
         })
     })

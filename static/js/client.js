@@ -17,17 +17,30 @@ require([
 ], function(Raphael, $, StopWatch, worldProxy, boxOfThings)
 {
     var shapeType = "circle";
+    var shapes = {};
     var paper = Raphael('viewport', "100%", "100%");
+
+    function broadcast(name, data) {
+        console.log("GOT BROADCAST", name);
+        switch (name)
+        {
+            case 'render':
+                render(data);
+                break;
+        }
+    };
+
     function render(data) {
         paper.clear();
         var worldBodies = JSON.parse(data);
-        worldBodies.forEach(function(body){
-            boxOfThings.drawThing(body, paper);
-        });
+        for(var id in worldBodies)
+        {
+            shapes[id] = boxOfThings.drawThing(worldBodies[id], paper);
+        }
         stopwatch.tickFrame();
-    };
+    }
 
-    worldProxy.init(render);
+    worldProxy.init(broadcast);
     var stopwatch = new StopWatch();
     //stopwatch.logFPS();
 

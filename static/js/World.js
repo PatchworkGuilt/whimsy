@@ -2,16 +2,18 @@ if (typeof define !== 'function') {
     var define = require('amdefine')(module);
 }
 define(function() {
-    var constructor = function(render, room_id)
+    var constructor = function(broadcast, room_id)
     {
-        var bodies = [];
-        var bodyLookupTable = {};
+        var bodies = {};
 
+        //Replicates the API of socketio so worldProxy can call local/server the same way
         this.emit = function(name, data){
-            switch(name){
+            switch (name){
                 case 'addBody':
-                    bodies.push(data);
-                    render(JSON.stringify(bodies));
+                    var newID = generateUUID();
+                    data.id = newID;
+                    bodies[newID] = data;
+                    broadcast('render', JSON.stringify(bodies));
                     break;
             }
         };
@@ -19,6 +21,16 @@ define(function() {
         this.getBodies = function(){
             return bodies;
         }
+
+        function generateUUID(){
+            var d = new Date().getTime();
+            var uuid = 'xxxxxxxxxxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+                var r = (d + Math.random()*16)%16 | 0;
+                d = Math.floor(d/16);
+                return (c=='x' ? r : (r&0x7|0x8)).toString(16);
+            });
+            return uuid;
+        };
     }
     return constructor;
 });

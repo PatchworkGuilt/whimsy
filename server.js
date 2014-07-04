@@ -19,28 +19,32 @@ app.use(express.static(__dirname + '/static/'));
 
 var room_id = "room1"; //Temporary, obviously
 
-requirejs(['World', './util/StopWatch'], function(World, StopWatch) {
+requirejs(['World'], function(World) {
     var io = require('socket.io').listen(app.listen(port));
     //io.set('log level', 2);
     var world;
-    var stopwatch = new StopWatch();
-    //stopwatch.logFPS();
 
     io.sockets.on('connection', function (socket) {
-        function renderWorld(worldData){
-            stopwatch.tickFrame();
-            socket.broadcast.to(room_id).volatile.emit('render', worldData);
+        function broadcast(name, worldData){
+            io.to(room_id).emit('broadcast', {name: name, data: worldData});
         };
         socket.join(room_id);
+        console.log("connected");
         if(!world)
-            world = new World(renderWorld, room_id);
-
+        {
+            world = new World(broadcast, room_id);
+        }
         socket.world = world;
+        socket.emit('broadcast', {name: 'render', data: JSON.stringify(world.getBodies())});
 
         socket.on('addBody', function(data){
             console.log("add", data);
             socket.world.emit('addBody', data);
         });
+        socket.on('disconnect', function(){
+            console.log("disconnect");
+        })
     });
+
 });
 console.log("Listening on port " + port);

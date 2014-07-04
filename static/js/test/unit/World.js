@@ -10,10 +10,10 @@ define(['../../World'], function(World){
         it("initially has no data", function(){
             var render = function(){};
             var world = new World(render, 'test');
-            assert.equal(world.getBodies().length, 0);
+            assert.deepEqual(world.getBodies(), {});
         });
-        describe("emit", function(){
-            it('adds a body when "addBody" is emitted', function(){
+        describe("addBody", function(){
+            it('adds a body', function(){
                 var render = function(){};
                 var world = new World(render, 'test');
                 var body = {
@@ -21,21 +21,30 @@ define(['../../World'], function(World){
                     x: 12,
                     y: 15
                 }
-                world.emit("addBody", body);
-                assert.equal(world.getBodies().length, 1);
+                world.addBody(body);
+                var bodies = world.getBodies();
+                var count = 0;
+                for(bodyID in bodies)
+                {
+                    count += 1;
+                    assert.equal(bodies[bodyID].type, body.type);
+                    assert.equal(bodies[bodyID].x, body.x);
+                    assert.equal(bodies[bodyID].y, body.y);
+                }
+                assert.equal(count, 1);
             });
-            it("calls render when 'addBody' is emitted", function(done){
-                var render = function(data){
+            it("calls broadcast", function(done){
+                var broadcast = function(data){
                     assert.isString(data);
                     done();
                 };
-                var world = new World(render, 'test');
+                var world = new World(broadcast, 'test');
                 var body = {
                     type: 'circle',
                     x: 12,
                     y: 15
                 }
-                world.emit("addBody", body);
+                world.addBody(body);
             });
         });
     });

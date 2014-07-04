@@ -5,18 +5,13 @@ if (typeof define !== 'function') {
 define(['World', 'socketio'], function(World, socketio){
     var proxy;
     var serverURL;
-    var renderCallback;
     var runningLocally;
+    var broadcast;
 
-    //Using this redirection allows us to asynchronously change where we
-    //handle the 'render' by changing renderCallback
-    function render(data){
-        renderCallback(data);
-    }
-
-    function init(render)
+    function init(broadcastFunction)
     {
-        renderCallback = render;
+        broadcast = broadcastFunction;
+        runningLocally = true;
         runLocally();
         serverURL = typeof document != "undefined"? document.URL: "testURL";
     }
@@ -34,7 +29,7 @@ define(['World', 'socketio'], function(World, socketio){
     function runLocally() {
         if(proxy && proxy.removeListener)
             proxy.removeListener("render");
-        proxy = new World(render, "room1");
+        proxy = new World(broadcast, "room1");
         runningLocally = true;
     }
 
@@ -44,10 +39,7 @@ define(['World', 'socketio'], function(World, socketio){
     }
 
     function isRunningLocally(){
-        if(runningLocally === true || typeof runningLocally === "undefined")
-            return true;
-        else
-            return false;
+        return runningLocally;
     }
 
     function add(data) {
@@ -57,17 +49,20 @@ define(['World', 'socketio'], function(World, socketio){
     function initSocket() {
         var socket = socketio.connect(serverURL);
 
-        socket.on('render', render);
-
-        socket.on('disconnect', function () {
+        socket.on('broadcast', function(data){
+            console.log("broadcast");
+            broadcast(data.name, data.data);
+        })
+        .on('disconnect', function () {
             console.log("What happen?");
-        });
-        socket.on('reconnecting', function () {
+        })
+        .on('reconnecting', function () {
             console.log("Come back!");
-        });
-        socket.on('reconnect_failed', function () {
+        })
+        .on('reconnect_failed', function () {
             console.log("Fuck.");
         });
+
         return socket;
     }
 

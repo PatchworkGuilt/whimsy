@@ -17,7 +17,7 @@ describe('worldProxy', function(){
         this.room = room;
     }
     var SocketMock = {
-        on: function(){}
+        on: function(){return this;}
     }
 
     before(function(){

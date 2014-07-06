@@ -17,7 +17,7 @@ require([
 ], function(Raphael, $, StopWatch, worldProxy, boxOfThings)
 {
     var shapeType = "circle";
-    var shapes = {};
+    shapes = {};
     var paper = Raphael('viewport', "100%", "100%");
 
     function broadcast(name, data) {
@@ -27,7 +27,53 @@ require([
             case 'render':
                 render(data);
                 break;
+            case 'add':
+                add(data);
+                break;
+            case 'update':
+                update(data);
         }
+    };
+
+    //Update the shape locally.  Should only be called as a result of a message from server
+    function update(data) {
+        var data = JSON.parse(data);
+        if(shapes[data.id])
+        {
+            var shape = shapes[data.id].shape;
+            shape.attr({
+                cx: data.x,
+                cy: data.y
+            });
+        };
+    };
+
+    //Add the shape locally. Should only be called as a result of a message from server
+    function add(data){
+        if(typeof data == "string")
+            data = JSON.parse(data);
+        var drawnShape = boxOfThings.drawThing(data, paper)
+        function start() {
+            this.startX = this.attr('cx');
+            this.startY = this.attr('cy');
+            console.log('start');
+        };
+        function move(dx,dy, x, y) {
+            var shapeData = shapes[data.id].metadata;
+            shapeData.x = this.startX + dx;
+            shapeData.y = this.startY + dy;
+            worldProxy.update(shapeData);
+            console.log('move');
+        };
+        function stop() {
+            console.log('stop');
+        };
+        drawnShape.drag(move, start, stop);
+        shapes[data.id] = {
+            metadata: data,
+            shape: drawnShape
+        }
+
     };
 
     function render(data) {
@@ -35,7 +81,7 @@ require([
         var worldBodies = JSON.parse(data);
         for(var id in worldBodies)
         {
-            shapes[id] = boxOfThings.drawThing(worldBodies[id], paper);
+            add(worldBodies[id]);
         }
         stopwatch.tickFrame();
     }

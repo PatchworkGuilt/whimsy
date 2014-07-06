@@ -46,6 +46,10 @@ define(['World', 'socketio'], function(World, socketio){
         proxy.emit('addBody', data);
     }
 
+    function update(data) {
+        proxy.emit("updateBody", data);
+    }
+
     function initSocket() {
         var socket = socketio.connect(serverURL);
 
@@ -70,6 +74,7 @@ define(['World', 'socketio'], function(World, socketio){
         runLocally: runLocally,
         runOnServer: runOnServer,
         add: add,
+        update: update,
         isRunningLocally: isRunningLocally,
         init: init,
         setProxy: setProxy,

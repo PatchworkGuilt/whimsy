@@ -10,17 +10,32 @@ define(function() {
         this.emit = function(name, data){
             switch (name){
                 case 'addBody':
-                    var newID = generateUUID();
-                    data.id = newID;
-                    bodies[newID] = data;
-                    broadcast('render', JSON.stringify(bodies));
+                    this.addBody(data);
                     break;
+                case 'updateBody':
+                    this.updateBody(data);
+                    break;
+            }
+        };
+
+        this.addBody = function(data) {
+            var newID = generateUUID();
+            data.id = newID;
+            bodies[newID] = data;
+            broadcast('add', JSON.stringify(data));
+        };
+
+        this.updateBody = function(data) {
+            if(data.id)
+            {
+                bodies[data.id] = data;
+                broadcast('update', JSON.stringify(data));
             }
         };
 
         this.getBodies = function(){
             return bodies;
-        }
+        };
 
         function generateUUID(){
             var d = new Date().getTime();

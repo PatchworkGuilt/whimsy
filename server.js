@@ -41,6 +41,10 @@ requirejs(['World'], function(World) {
             console.log("add", data);
             socket.world.emit('addBody', data);
         });
+        socket.on('updateBody', function(data){
+            console.log("update", data);
+            socket.world.emit('updateBody', data);
+        });
         socket.on('disconnect', function(){
             console.log("disconnect");
         })

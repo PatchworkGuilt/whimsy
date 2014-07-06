@@ -13,7 +13,7 @@ define(function() {
                 }
             },
             draw: function(thing, paper) {
-                return paper.circle(thing.x, thing.y, thing.radius);
+                return paper.circle(thing.x, thing.y, thing.radius).attr({fill: 'gray'});
             }
         },
         rect: {

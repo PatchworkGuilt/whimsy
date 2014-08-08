@@ -15,6 +15,8 @@ define(function() {
                 case 'updateBody':
                     this.updateBody(data);
                     break;
+                case 'selectBody':
+                    this.selectBody(data);
             }
         };
 
@@ -31,6 +33,10 @@ define(function() {
                 bodies[data.id] = data;
                 broadcast('update', JSON.stringify(data));
             }
+        };
+
+        this.selectBody = function(data) {
+            broadcast('select', JSON.stringify(data));
         };
 
         this.getBodies = function(){

@@ -4,7 +4,18 @@ requirejs.config({
       'raphael': 'third-party/raphael-2.1.2',
       'socketio': '/socket.io/socket.io.js',
       'stopwatch': './util/StopWatch',
-      'worldProxy': 'worldProxy'
+      'worldProxy': 'worldProxy',
+      'backbone': 'third-party/backbone',
+      'underscore': 'third-party/underscore'
+    },
+    shim: {
+        'backbone': {
+            deps: ['underscore', 'jquery'],
+            exports: 'Backbone'
+        },
+        'underscore': {
+            exports: '_'
+        }
     }
 });
 
@@ -13,15 +24,24 @@ require([
     'jquery',
     'stopwatch',
     'worldProxy',
-    'boxOfThings'
-], function(Raphael, $, StopWatch, worldProxy, boxOfThings)
+    'shapeFactory',
+    'ToolBox'
+], function(Raphael, $, StopWatch, worldProxy, shapeFactory, ToolBox)
 {
     var shapeType = "circle";
-    shapes = {};
+    var shapes = {};
+    window.shapes = shapes;
+    var dragStopTime = 0;
     var paper = Raphael('viewport', "100%", "100%");
+    paper.width = $("#viewport").width();
+    paper.height = $("#viewport").height();
 
-    function broadcast(name, data) {
+    shapeFactory.setPaper(paper);
+
+
+    function broadcastReceived(name, data) {
         console.log("GOT BROADCAST", name);
+        var data = JSON.parse(data);
         switch (name)
         {
             case 'render':
@@ -32,75 +52,64 @@ require([
                 break;
             case 'update':
                 update(data);
+                break;
+            case 'select':
+                selectBody(data);
+                break;
         }
     };
 
     //Update the shape locally.  Should only be called as a result of a message from server
     function update(data) {
-        var data = JSON.parse(data);
         if(shapes[data.id])
         {
-            var shape = shapes[data.id].shape;
-            shape.attr({
-                cx: data.x,
-                cy: data.y
-            });
-        };
+            var shape = shapes[data.id];
+            //TODO: Validation
+            shape.model.set(data);
+        }
+        else
+            console.log("COULDN'T FIND SHAPE: " + data.id);
     };
 
     //Add the shape locally. Should only be called as a result of a message from server
     function add(data){
-        if(typeof data == "string")
-            data = JSON.parse(data);
-        var drawnShape = boxOfThings.drawThing(data, paper)
-        function start() {
-            this.startX = this.attr('cx');
-            this.startY = this.attr('cy');
-            console.log('start');
-        };
-        function move(dx,dy, x, y) {
-            var shapeData = shapes[data.id].metadata;
-            shapeData.x = this.startX + dx;
-            shapeData.y = this.startY + dy;
-            worldProxy.update(shapeData);
-            console.log('move');
-        };
-        function stop() {
-            console.log('stop');
-        };
-        drawnShape.drag(move, start, stop);
-        shapes[data.id] = {
-            metadata: data,
-            shape: drawnShape
-        }
-
+        var shape = shapeFactory.createNewFromData(data);
+        shape.render();
+        shapes[data.id] = shape;
     };
 
-    function render(data) {
-        paper.clear();
-        var worldBodies = JSON.parse(data);
+    function selectBody(data) {
+        //shapes[data.id].shape.attr({fill: 'pink'});
+    }
+
+    function render(worldBodies) {
+        //paper.clear();
+        shapes = {};
         for(var id in worldBodies)
         {
             add(worldBodies[id]);
         }
-        stopwatch.tickFrame();
     }
 
-    worldProxy.init(broadcast);
-    var stopwatch = new StopWatch();
-    //stopwatch.logFPS();
-
-    $('#viewport').click(function(event){
-        var circle = boxOfThings.getThing(shapeType, event.offsetX, event.offsetY);
-        worldProxy.add(circle);
-    })
+    worldProxy.init(broadcastReceived);
+    var tools = new ToolBox(paper, ['circle', 'circle', 'rect'], function(event, data){
+        switch(event){
+            case 'add':
+                var shape = shapeFactory.createNew(data.type, data.x, data.y);
+                worldProxy.add(shape.model.toJSON());
+                break;
+        }
+    });
 
     $("input[name=toggleControl]").change(function(event){
         var value = event.target.value;
         if(value == "server")
             worldProxy.runOnServer();
         else if(value == "local")
+        {
             worldProxy.runLocally();
+        }
+
     });
 
     $("input[name=shapeType]").change(function(event){

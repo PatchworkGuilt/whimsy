@@ -50,6 +50,10 @@ define(['World', 'socketio'], function(World, socketio){
         proxy.emit("updateBody", data);
     }
 
+    function select(id) {
+        proxy.emit("selectBody", id);
+    }
+
     function initSocket() {
         var socket = socketio.connect(serverURL);
 
@@ -75,6 +79,7 @@ define(['World', 'socketio'], function(World, socketio){
         runOnServer: runOnServer,
         add: add,
         update: update,
+        select: select,
         isRunningLocally: isRunningLocally,
         init: init,
         setProxy: setProxy,

@@ -9,7 +9,8 @@
     "express": "latest",
     "jade": "latest",
     "requirejs": "latest",
-    "socket.io": "latest"
+    "socket.io": "latest",
+    "underscore": "^1.6.0"
   },
   "author": "Scott Morse",
   "scripts": {

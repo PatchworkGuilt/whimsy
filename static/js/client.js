@@ -95,7 +95,7 @@ require([
     var tools = new ToolBox(paper, ['circle', 'circle', 'rect'], function(event, data){
         switch(event){
             case 'add':
-                var shape = shapeFactory.createNew(data.type, data.x, data.y);
+                var shape = shapeFactory.createNewFromData(data);
                 worldProxy.add(shape.model.toJSON());
                 break;
         }
@@ -110,9 +110,5 @@ require([
             worldProxy.runLocally();
         }
 
-    });
-
-    $("input[name=shapeType]").change(function(event){
-        shapeType = event.target.value;
     });
 });

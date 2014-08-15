@@ -1,5 +1,6 @@
 var assert = require("chai").assert;
 var requirejs = require("requirejs");
+/*
 requirejs.config({
     baseUrl: ".",
     paths: {
@@ -113,3 +114,4 @@ describe('worldProxy', function(){
         })
     })
 });
+*/

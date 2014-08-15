@@ -92,7 +92,7 @@ require([
     }
 
     worldProxy.init(broadcastReceived);
-    var tools = new ToolBox(paper, ['circle', 'circle', 'rect'], function(event, data){
+    var tools = new ToolBox(paper, ['circle', 'owl', 'rect'], function(event, data){
         switch(event){
             case 'add':
                 var shape = shapeFactory.createNewFromData(data);

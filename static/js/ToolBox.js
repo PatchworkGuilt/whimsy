@@ -15,17 +15,16 @@ define(['shapeFactory'], function(shapeFactory) {
                 x: startPoint.x + (CELL_WIDTH * i),
                 y: startPoint.y - CELL_HEIGHT
             }
-            var shapeY = shapeOrigin.y + (CELL_HEIGHT / 2);
-            var shapeX = shapeOrigin.x + (CELL_WIDTH / 2);
-            drawTool(shapeName, shapeX, shapeY);
+            drawTool(shapeName, shapeOrigin.x, shapeOrigin.y);
         }
 
         function drawTool(name, x, y) {
             //Tool background
-            paper.rect(shapeOrigin.x, shapeOrigin.y, CELL_WIDTH, CELL_HEIGHT)
+            paper.rect(x, y, CELL_WIDTH, CELL_HEIGHT)
                 .attr({fill: 'gray'})
                 .toBack();
-            var shapeTemplate = shapeFactory.createNew(name, shapeX, shapeY);
+            var startingLoc = {x: x + (CELL_WIDTH/2), y: y + (CELL_HEIGHT/2)};
+            var shapeTemplate = shapeFactory.createNew(name, startingLoc.x, startingLoc.y);
             drawShapeEntry(shapeTemplate);
             shapeTemplate.model.on('drag:end', function(){
                 callback("add", this.toJSON());
@@ -33,7 +32,7 @@ define(['shapeFactory'], function(shapeFactory) {
             });
 
             function drawShapeEntry(shape) {
-                shape.model.setLocation(x, y);
+                shape.model.setLocation(startingLoc.x, startingLoc.y);
                 shapeTemplate.render();
                 //shapeTemplate.drawnShape.animate({x: x, y: y}, 1000);
             }

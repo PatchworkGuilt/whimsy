@@ -36,6 +36,12 @@ define(['backbone', 'worldProxy'], function(Backbone, worldProxy) {
                 colorString += color.toString(16);
             }
             return colorString;
+        },
+        getTopLeftCorner: function() {
+            var centered = {};
+            centered['x'] = this.get('x') - (this.get('width') / 2.0);
+            centered['y'] = this.get('y') - (this.get('height') / 2.0);
+            return centered;
         }
     });
 
@@ -62,9 +68,46 @@ define(['backbone', 'worldProxy'], function(Backbone, worldProxy) {
         }
     });
 
+    var ImageModel = ShapeModel.extend({
+        initialize: function() {
+            this.setDefaults({
+                type: 'image',
+                height: 30,
+                width: 30
+            });
+            this.shapeAttrKeys = [];
+        }
+    });
+
     var ShapeView = Backbone.View.extend({
         initialize: function(){},
         render: function(){}
+    });
+
+    var RectangleView = ShapeView.extend({
+        initialize: function(options){
+            this.model = new RectangleModel(options);
+            this.model.on("change", _.bind(this.render, this));
+        },
+        render: function(){
+            var topLeft = this.model.getTopLeftCorner();
+            if(!this.drawnShape)
+            {
+                this.drawnShape = this.drawShape(topLeft.x, topLeft.y);
+                addDrag(this);
+            }
+            else
+            {
+                var modelJSON = this.model.toJSON();
+                modelJSON['x'] = topLeft.x;
+                modelJSON['y'] = topLeft.y;
+                this.drawnShape.animate(modelJSON);
+            }
+            this.drawnShape.attr(this.model.getAttrKeys(this.shapeAttrKeys)).toFront();
+        },
+        drawShape: function(x, y){
+            return paper.rect(x, y, this.model.get('width'), this.model.get('height'));
+        }
     });
 
     var Shapes = {};
@@ -81,35 +124,24 @@ define(['backbone', 'worldProxy'], function(Backbone, worldProxy) {
             }
             else
                 this.drawnShape.animate(this.model.toJSON());
-            this.drawnShape.attr(this.model.getAttrKeys());
+            this.drawnShape.attr(this.model.getAttrKeys()).toFront();
         }
 
     });
 
-    Shapes['rect'] = ShapeView.extend({
-        initialize: function(options){
-            this.model = new RectangleModel(options);
+    Shapes['rect'] = RectangleView;
+
+    Shapes['owl'] = RectangleView.extend({
+        initialize: function(options) {
+            options['url'] = 'images/owl.jpeg';
+            options['type'] = 'owl';
+            this.model = new ImageModel(options);
             this.model.on("change", _.bind(this.render, this));
         },
-        render: function(){
-            var centeredX = this.model.get('x') - (this.model.get('width') / 2.0);
-            var centeredY = this.model.get('y') - (this.model.get('height') / 2.0);
-            if(!this.drawnShape)
-            {
-                this.drawnShape = paper.rect(centeredX, centeredY, this.model.get('width'), this.model.get('height'));
-                addDrag(this);
-            }
-            else
-            {
-                var modelJSON = this.model.toJSON();
-                modelJSON['x'] = centeredX;
-                modelJSON['y'] = centeredY;
-                this.drawnShape.animate(modelJSON);
-            }
-            this.drawnShape.attr(this.model.getAttrKeys(this.shapeAttrKeys));
+        drawShape: function(x,y){
+            return paper.image(this.model.get("url"), x, y, this.model.get("width"), this.model.get("height"));
         }
-
-    });
+    })
 
     function addDrag(shape){
         var didDrag = false;

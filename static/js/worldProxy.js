@@ -7,13 +7,15 @@ define(['World', 'socketio'], function(World, socketio){
     var serverURL;
     var runningLocally;
     var broadcast;
+    var room_id;
 
     function init(broadcastFunction)
     {
         broadcast = broadcastFunction;
         runningLocally = true;
-        runLocally();
-        serverURL = typeof document != "undefined"? document.URL: "testURL";
+        runOnServer();
+        serverURL = window? window.location.host: undefined;
+        room_id = window? window.location.pathname.split("/")[1]: undefined;
     }
 
     function setProxy(p)
@@ -29,7 +31,7 @@ define(['World', 'socketio'], function(World, socketio){
     function runLocally() {
         if(proxy && proxy.removeListener)
             proxy.removeListener("render");
-        proxy = new World(broadcast, "room1");
+        proxy = new World(broadcast);
         runningLocally = true;
     }
 
@@ -55,11 +57,17 @@ define(['World', 'socketio'], function(World, socketio){
     }
 
     function initSocket() {
+        console.log("URL", serverURL);
         var socket = socketio.connect(serverURL);
+        window.socket = socket;
 
         socket.on('broadcast', function(data){
             console.log("broadcast");
             broadcast(data.name, data.data);
+        })
+        .on('connect', function(){
+            console.log("Joined ", room_id);
+            socket.emit('room', room_id);
         })
         .on('disconnect', function () {
             console.log("What happen?");
@@ -70,6 +78,7 @@ define(['World', 'socketio'], function(World, socketio){
         .on('reconnect_failed', function () {
             console.log("Fuck.");
         });
+
 
         return socket;
     }

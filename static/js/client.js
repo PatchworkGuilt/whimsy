@@ -28,7 +28,6 @@ require([
     'ToolBox'
 ], function(Raphael, $, StopWatch, worldProxy, shapeFactory, ToolBox)
 {
-    var shapeType = "circle";
     var shapes = {};
     window.shapes = shapes;
     var dragStopTime = 0;
@@ -99,16 +98,5 @@ require([
                 worldProxy.add(shape.model.toJSON());
                 break;
         }
-    });
-
-    $("input[name=toggleControl]").change(function(event){
-        var value = event.target.value;
-        if(value == "server")
-            worldProxy.runOnServer();
-        else if(value == "local")
-        {
-            worldProxy.runLocally();
-        }
-
     });
 });

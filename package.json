@@ -8,6 +8,8 @@
     "ejs": "^1.0.0",
     "express": "latest",
     "jade": "latest",
+    "mongodb": "^1.4.8",
+    "mongoose": "^3.8.14",
     "requirejs": "latest",
     "socket.io": "latest",
     "underscore": "^1.6.0"

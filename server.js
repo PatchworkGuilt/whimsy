@@ -9,7 +9,6 @@ requirejs.config({
 });
 
 app.set('views', __dirname + '/static/html');
-//app.set('view engine', "ejs");
 app.engine('html', require('ejs').renderFile);
 app.get("/:room_id", function(req, res){
     res.render("index.html");
@@ -21,11 +20,9 @@ app.get("/", function(req, res){
 
 app.use(express.static(__dirname + '/static/'));
 
-//var room_id = "room1"; //Temporary, obviously
 
 requirejs(['World'], function(World) {
     var io = require('socket.io').listen(app.listen(port));
-    //io.set('log level', 2);
     var rooms = {};
 
     io.sockets.on('connection', function (socket) {
@@ -55,7 +52,7 @@ requirejs(['World'], function(World) {
             }
             socket.room = rooms[room_id];
 
-            socket.emit('broadcast', {name: 'render', data: JSON.stringify(socket.room.getBodies())});
+            socket.emit('broadcast', {name: 'resetTo', data: JSON.stringify(socket.room.getBodies())});
         });
         socket.on('addBody', function(data){
             console.log("add", data);

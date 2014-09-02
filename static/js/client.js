@@ -25,11 +25,11 @@ require([
     'stopwatch',
     'worldProxy',
     'shapeFactory',
-    'ToolBox'
-], function(Raphael, $, StopWatch, worldProxy, shapeFactory, ToolBox)
+    'ToolBox',
+    'models/ShapeModels'
+], function(Raphael, $, StopWatch, worldProxy, shapeFactory, ToolBox, ShapeModels)
 {
-    var shapes = {};
-    window.shapes = shapes;
+    var allShapes = new ShapeModels.ShapeCollection();
     var dragStopTime = 0;
     var paper = Raphael('viewport', "100%", "100%");
     paper.width = $("#viewport").width();
@@ -37,14 +37,13 @@ require([
 
     shapeFactory.setPaper(paper);
 
-
     function broadcastReceived(name, data) {
         console.log("GOT BROADCAST", name);
         var data = JSON.parse(data);
         switch (name)
         {
-            case 'render':
-                render(data);
+            case 'resetTo':
+                resetTo(data);
                 break;
             case 'add':
                 add(data);
@@ -59,31 +58,30 @@ require([
     };
 
     //Update the shape locally.  Should only be called as a result of a message from server
-    function update(data) {
-        if(shapes[data.id])
+    function update(updates) {
+        var shape = allShapes.get(updates.id);
+        if(shape)
         {
-            var shape = shapes[data.id];
             //TODO: Validation
-            shape.model.set(data);
+            shape.model.set(updates);
         }
         else
-            console.log("COULDN'T FIND SHAPE: " + data.id);
+            console.error("COULDN'T FIND SHAPE: " + updates.id);
     };
 
     //Add the shape locally. Should only be called as a result of a message from server
     function add(data){
         var shape = shapeFactory.createNewFromData(data);
-        shape.render();
-        shapes[data.id] = shape;
+        allShapes.add(shape);
     };
 
     function selectBody(data) {
         //shapes[data.id].shape.attr({fill: 'pink'});
     }
 
-    function render(worldBodies) {
+    function resetTo(worldBodies) {
         //paper.clear();
-        shapes = {};
+        allShapes.reset();
         for(var id in worldBodies)
         {
             add(worldBodies[id]);

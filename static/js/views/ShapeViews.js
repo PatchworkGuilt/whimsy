@@ -1,7 +1,47 @@
 define(['backbone', 'models/ShapeModels'], function(Backbone, ShapeModels) {
     var ShapeView = Backbone.View.extend({
         initialize: function(){},
-        render: function(){}
+        render: function(){},
+        addListeners: function(){
+            addDrag(this);
+            addClick(this);
+        },
+
+        drawAsSelected: function(){
+            bbox = this.drawnShape.getBBox();
+            rect = this.paper.rect(bbox.x - 5, bbox.y - 5, bbox.width + 10, bbox.height + 10)
+            this.whenSelected = rect;
+        },
+
+        render: function() {
+            if(!this.drawnShape)
+            {
+                loc = this.getCurrentLocation()
+                this.drawnShape = this.drawShape(loc.x, loc.y);
+                this.addListeners(this);
+            }
+            else
+            {
+                var json = this.getShapeJSON();
+                this.drawnShape.animate(json);
+            }
+            this.drawnShape.attr(this.model.getAttributes()).toFront();
+            if(this.whenSelected)
+            {
+                this.whenSelected.remove();
+                this.whenSelected = null;
+            }
+            if(this.model.get('isSelected'))
+                this.drawAsSelected()
+        },
+
+        getShapeJSON: function() {
+            return this.model.toJSON();
+        },
+
+        getCurrentLocation: function() {
+            return {x: this.model.get('x'), y: this.model.get('y')}
+        }
     });
 
     var RectangleView = ShapeView.extend({
@@ -10,25 +50,23 @@ define(['backbone', 'models/ShapeModels'], function(Backbone, ShapeModels) {
             this.model = new ShapeModels.RectangleModel(options);
             this.model.on("change", _.bind(this.render, this));
         },
-        render: function(){
-            var topLeft = this.model.getTopLeftCorner();
-            if(!this.drawnShape)
-            {
-                this.drawnShape = this.drawShape(topLeft.x, topLeft.y);
-                addDrag(this);
-            }
-            else
-            {
-                var modelJSON = this.model.toJSON();
-                modelJSON['x'] = topLeft.x;
-                modelJSON['y'] = topLeft.y;
-                this.drawnShape.animate(modelJSON);
-            }
-            this.drawnShape.attr(this.model.getAttrKeys(this.shapeAttrKeys)).toFront();
-        },
+
         drawShape: function(x, y){
             return this.paper.rect(x, y, this.model.get('width'), this.model.get('height'));
+        },
+
+        getCurrentLocation: function() {
+            return this.model.getTopLeftCorner();
+        },
+
+        getShapeJSON: function() {
+            topLeft = this.model.getTopLeftCorner();
+            var modelJSON = this.model.toJSON();
+            modelJSON['x'] = topLeft.x;
+            modelJSON['y'] = topLeft.y;
+            return modelJSON;
         }
+
     });
 
     var CircleView = ShapeView.extend({
@@ -37,15 +75,9 @@ define(['backbone', 'models/ShapeModels'], function(Backbone, ShapeModels) {
             this.model = new ShapeModels.CircleModel(options);
             this.model.on("change", _.bind(this.render, this));
         },
-        render: function(){
-            if(!this.drawnShape)
-            {
-                this.drawnShape = this.paper.circle(this.model.get('x'), this.model.get('y'), this.model.get('radius'));
-                addDrag(this);
-            }
-            else
-                this.drawnShape.animate(this.model.toJSON());
-            this.drawnShape.attr(this.model.getAttrKeys()).toFront();
+
+        drawShape: function(x,y){
+            return this.paper.circle( x, y, this.model.get('radius'));
         }
 
     });
@@ -69,6 +101,7 @@ define(['backbone', 'models/ShapeModels'], function(Backbone, ShapeModels) {
         function start() {
             shape.startX = shape.model.get('cx') || shape.model.get('x');
             shape.startY = shape.model.get('cy') || shape.model.get('y');
+            shape.model.select();
         };
         function move(dx,dy, x, y) {
             shape.model.setLocation(shape.startX + dx, shape.startY + dy);
@@ -83,6 +116,12 @@ define(['backbone', 'models/ShapeModels'], function(Backbone, ShapeModels) {
             }
         };
         shape.drawnShape.drag(move, start, stop);
+    }
+
+    function addClick(shape) {
+        shape.drawnShape.click(function(){
+            shape.model.select();
+        })
     }
 
     return {

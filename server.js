@@ -31,14 +31,12 @@ requirejs(['World'], function(World) {
         function broadcast(name, worldData){
             if(room_id)
             {
-                console.log("emitting to ", room_id);
                 io.to(room_id).emit('broadcast', {name: name, data: worldData});
             }
             else
                 socket.emit("InvalidStateError", "No Room_ID");
         };
         socket.on('room', function(id){
-            console.log("joining ", id);
             room_id = id;
             socket.join(room_id);
 
@@ -47,19 +45,16 @@ requirejs(['World'], function(World) {
                 rooms[room_id] = new World(broadcast);
                 console.log('created room', room_id);
             }
-            else{
-                console.log("ROOMS", rooms);
-            }
             socket.room = rooms[room_id];
 
             socket.emit('broadcast', {name: 'resetTo', data: JSON.stringify(socket.room.getBodies())});
         });
         socket.on('addBody', function(data){
-            console.log("add", data);
+            console.log("addbody");
             socket.room.emit('addBody', data);
         });
         socket.on('updateBody', function(data){
-            console.log("update", data);
+            console.log("updatebody");
             socket.room.emit('updateBody', data);
         });
         socket.on('disconnect', function(){

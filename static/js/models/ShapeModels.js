@@ -1,13 +1,36 @@
-define(['backbone'], function(Backbone) {
+define(['backbone', 'worldProxy'], function(Backbone, worldProxy) {
     var ShapeModel = Backbone.Model.extend({
         initialize: function() {
             this.shapeAttrKeys = ['fill'];
         },
-        setLocation: function(x,y) {
-            this.set({"x": x, "cx": x});
-            this.set({"y": y, "cy": y});
+        sync: function(method, model, options) {
+            console.log("syncing", method);
+            switch(method){
+                case 'update':
+                    worldProxy.update(model.toJSON());
+                    break;
+                case 'create':
+                    worldProxy.add(model.toJSON());
+                    break;
+                default:
+                    Backbone.sync.call(method, model, options);
+            }
         },
-        getAttrKeys: function(){
+
+        setLocation: function(x,y) {
+            var updates = {
+                "x": x,
+                "cx": x,
+                "y": y,
+                "cy": y
+            }
+            if(this.doNotSync)
+                this.set(updates);
+            else
+                this.save(updates);
+        },
+
+        getAttributes: function(){
             var attrs = {}
             for(var i=0; i<this.shapeAttrKeys.length; i++)
             {
@@ -16,6 +39,7 @@ define(['backbone'], function(Backbone) {
             }
             return attrs;
         },
+
         setDefaults: function(defaults) {
             for(key in defaults)
             {
@@ -23,6 +47,7 @@ define(['backbone'], function(Backbone) {
                     this.set(key, defaults[key]);
             }
         },
+
         getPastelColor: function() {
             var baseColor = [255, 255, 255];
             var colorString = "#";
@@ -33,11 +58,17 @@ define(['backbone'], function(Backbone) {
             }
             return colorString;
         },
+
         getTopLeftCorner: function() {
             var coord = {};
             coord['x'] = this.get('x') - (this.get('width') / 2.0);
             coord['y'] = this.get('y') - (this.get('height') / 2.0);
             return coord;
+        },
+
+        select: function() {
+            console.log("selected");
+            this.trigger('clicked', this);
         }
     });
 
@@ -76,7 +107,23 @@ define(['backbone'], function(Backbone) {
     });
 
     var ShapeCollection = Backbone.Collection.extend({
-        model: ShapeModel
+        model: ShapeModel,
+
+        initialize: function(){
+            this.on('clicked', this.onClicked);
+        },
+
+        onClicked: function(model) {
+            prevSelected = this.where({'isSelected': true});
+            for(var i=0; i<prevSelected.length; i++)
+            {
+                prev = prevSelected[i];
+                if(prev.get('id') != model.get('id'))
+                    prev.unset('isSelected');
+            }
+            model.set('isSelected', true);
+        }
+
     });
 
     return {

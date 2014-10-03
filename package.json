@@ -9,7 +9,7 @@
     "express": "latest",
     "jade": "latest",
     "mongodb": "^1.4.8",
-    "mongoose": "^3.8.14",
+    "mongoose": "^3.8.17",
     "requirejs": "latest",
     "socket.io": "latest",
     "underscore": "^1.6.0"

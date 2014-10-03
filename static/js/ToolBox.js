@@ -25,6 +25,7 @@ define(['shapeFactory'], function(shapeFactory) {
                 .toBack();
             var startingLoc = {x: x + (CELL_WIDTH/2), y: y + (CELL_HEIGHT/2)};
             var shapeTemplate = shapeFactory.createNew(name, startingLoc.x, startingLoc.y);
+            shapeTemplate.model.doNotSync = true;
             drawShapeEntry(shapeTemplate);
             shapeTemplate.model.on('drag:end', function(){
                 callback("add", this.toJSON());

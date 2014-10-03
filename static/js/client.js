@@ -29,8 +29,7 @@ require([
     'models/ShapeModels'
 ], function(Raphael, $, StopWatch, worldProxy, shapeFactory, ToolBox, ShapeModels)
 {
-    var allShapes = new ShapeModels.ShapeCollection();
-    var dragStopTime = 0;
+    var shapesCollection = new ShapeModels.ShapeCollection();
     var paper = Raphael('viewport', "100%", "100%");
     paper.width = $("#viewport").width();
     paper.height = $("#viewport").height();
@@ -59,11 +58,11 @@ require([
 
     //Update the shape locally.  Should only be called as a result of a message from server
     function update(updates) {
-        var shape = allShapes.get(updates.id);
+        var shape = shapesCollection.get(updates.id);
         if(shape)
         {
             //TODO: Validation
-            shape.model.set(updates);
+            shape.set(updates);
         }
         else
             console.error("COULDN'T FIND SHAPE: " + updates.id);
@@ -72,16 +71,18 @@ require([
     //Add the shape locally. Should only be called as a result of a message from server
     function add(data){
         var shape = shapeFactory.createNewFromData(data);
-        allShapes.add(shape);
+        shape.render();
+        shapesCollection.add(shape.model);
     };
 
     function selectBody(data) {
         //shapes[data.id].shape.attr({fill: 'pink'});
     }
 
+    //Clear all shapes and add all passed shapes. Should only be called as a result of a message from server
     function resetTo(worldBodies) {
         //paper.clear();
-        allShapes.reset();
+        shapesCollection.reset();
         for(var id in worldBodies)
         {
             add(worldBodies[id]);
@@ -93,7 +94,7 @@ require([
         switch(event){
             case 'add':
                 var shape = shapeFactory.createNewFromData(data);
-                worldProxy.add(shape.model.toJSON());
+                shape.model.save();
                 break;
         }
     });

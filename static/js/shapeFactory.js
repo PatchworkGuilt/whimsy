@@ -7,13 +7,11 @@ define(['backbone', 'views/ShapeViews'], function(Backbone, ShapeViews) {
     this.createNew = function(thingName, x, y){
         var viewData = {x: x, y: y};
         var shape = buildNewShape(thingName, viewData);
-        shape.render();
         return shape;
     };
 
     this.createNewFromData = function(data) {
         var shape = buildNewShape(data.type, data);
-        shape.render();
         return shape;
     };
 

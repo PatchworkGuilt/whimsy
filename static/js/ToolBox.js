@@ -29,12 +29,12 @@ define(['shapeFactory'], function(shapeFactory) {
             drawShapeEntry(shapeTemplate);
             shapeTemplate.model.on('drag:end', function(){
                 callback("add", this.toJSON());
-                drawShapeEntry(shapeTemplate);
+                drawShapeEntry(shapeTemplate); //Create a new template every time?
             });
 
             function drawShapeEntry(shape) {
                 shape.model.setLocation(startingLoc.x, startingLoc.y);
-                shapeTemplate.render();
+                shape.drawnShape.toFront();
                 //shapeTemplate.drawnShape.animate({x: x, y: y}, 1000);
             }
         }

@@ -37,7 +37,6 @@ require([
     shapeFactory.setPaper(paper);
 
     function broadcastReceived(name, data) {
-        console.log("GOT BROADCAST", name);
         var data = JSON.parse(data);
         switch (name)
         {
@@ -58,14 +57,14 @@ require([
 
     //Update the shape locally.  Should only be called as a result of a message from server
     function update(updates) {
-        var shape = shapesCollection.get(updates.id);
+        var shape = shapesCollection.get(updates._id);
         if(shape)
         {
             //TODO: Validation
             shape.set(updates);
         }
         else
-            console.error("COULDN'T FIND SHAPE: " + updates.id);
+            console.error("COULDN'T FIND SHAPE: " + updates._id);
     };
 
     //Add the shape locally. Should only be called as a result of a message from server
@@ -90,9 +89,10 @@ require([
     }
 
     worldProxy.init(broadcastReceived);
-    var tools = new ToolBox(paper, ['circle', 'owl', 'rect'], function(event, data){
+    var tools = new ToolBox(paper, ['circle', 'star', 'rect'], function(event, data){
         switch(event){
             case 'add':
+                console.log("Adding", data);
                 var shape = shapeFactory.createNewFromData(data);
                 shape.model.save();
                 break;

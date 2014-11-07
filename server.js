@@ -10,9 +10,23 @@ requirejs.config({
 
 app.set('views', __dirname + '/static/html');
 app.engine('html', require('ejs').renderFile);
-app.get("/:room_id", function(req, res){
-    res.render("index.html");
+app.post("/create_new_room", function(req, res){
+    requirejs(['util/db'], function(db){
+        room = db.createRoom();
+        res.redirect("/" + room['_id']);
+    });
 });
+app.get("/:room_id", function(req, res){
+    requirejs(['util/db'], function(db){
+        db.getRoom(req.params.room_id, function(err, room){
+            if(room)
+                res.render("index.html");
+            else
+                res.status(404).send('Room Not Found!');
+        });
+    });
+});
+
 app.get("/", function(req, res){
     //Eventually, this will be a landing page.
     res.render("index.html");
@@ -42,7 +56,7 @@ requirejs(['World'], function(World) {
 
             if(!(room_id in rooms))
             {
-                rooms[room_id] = new World(broadcast);
+                rooms[room_id] = new World(broadcast, room_id);
                 console.log('created room', room_id);
             }
             socket.room = rooms[room_id];

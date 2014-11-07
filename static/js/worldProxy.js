@@ -2,7 +2,7 @@ if (typeof define !== 'function') {
     var define = require('amdefine')(module);
 }
 
-define(['World', 'socketio'], function(World, socketio){
+define(['socketio'], function(socketio){
     var proxy;
     var serverURL;
     var runningLocally;
@@ -29,10 +29,12 @@ define(['World', 'socketio'], function(World, socketio){
     }
 
     function runLocally() {
-        if(proxy && proxy.removeListener)
-            proxy.removeListener("render");
-        proxy = new World(broadcast);
-        runningLocally = true;
+        define(['World'], function(World){
+            if(proxy && proxy.removeListener)
+                proxy.removeListener("render");
+            proxy = new World(broadcast);
+            runningLocally = true;
+        })
     }
 
     function runOnServer() {
@@ -57,7 +59,6 @@ define(['World', 'socketio'], function(World, socketio){
     }
 
     function initSocket() {
-        console.log("URL", serverURL);
         var socket = socketio.connect(serverURL);
         window.socket = socket;
 

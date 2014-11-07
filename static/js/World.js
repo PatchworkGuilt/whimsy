@@ -1,8 +1,8 @@
 if (typeof define !== 'function') {
     var define = require('amdefine')(module);
 }
-define(function() {
-    var constructor = function(broadcast)
+define(['util/db'], function(db) {
+    var constructor = function(broadcast, roomId)
     {
         var bodies = {};
 
@@ -21,17 +21,19 @@ define(function() {
         };
 
         this.addBody = function(data) {
-            var newID = generateUUID();
-            data.id = newID;
+            var newID = db.getNewId();
+            data._id = newID;
             bodies[newID] = data;
             broadcast('add', JSON.stringify(data));
+            db.addShape(roomId, data);
         };
 
         this.updateBody = function(data) {
-            if(data.id)
+            if(data._id)
             {
-                bodies[data.id] = data;
+                bodies[data._id] = data;
                 broadcast('update', JSON.stringify(data));
+                db.updateShape(roomId, data._id, data);
             }
         };
 
@@ -41,16 +43,6 @@ define(function() {
 
         this.getBodies = function(){
             return bodies;
-        };
-
-        function generateUUID(){
-            var d = new Date().getTime();
-            var uuid = 'xxxxxxxxxxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-                var r = (d + Math.random()*16)%16 | 0;
-                d = Math.floor(d/16);
-                return (c=='x' ? r : (r&0x7|0x8)).toString(16);
-            });
-            return uuid;
         };
     }
     return constructor;

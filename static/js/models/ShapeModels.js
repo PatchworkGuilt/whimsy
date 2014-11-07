@@ -1,10 +1,8 @@
 define(['backbone', 'worldProxy'], function(Backbone, worldProxy) {
     var ShapeModel = Backbone.Model.extend({
-        initialize: function() {
-            this.shapeAttrKeys = ['fill'];
-        },
+        idAttribute: '_id',
+
         sync: function(method, model, options) {
-            console.log("syncing", method);
             switch(method){
                 case 'update':
                     worldProxy.update(model.toJSON());
@@ -31,13 +29,7 @@ define(['backbone', 'worldProxy'], function(Backbone, worldProxy) {
         },
 
         getAttributes: function(){
-            var attrs = {}
-            for(var i=0; i<this.shapeAttrKeys.length; i++)
-            {
-                var key = this.shapeAttrKeys[i];
-                attrs[key] = this.get(key);
-            }
-            return attrs;
+            return this.get('attr');
         },
 
         setDefaults: function(defaults) {
@@ -46,6 +38,10 @@ define(['backbone', 'worldProxy'], function(Backbone, worldProxy) {
                 if(!this.has(key))
                     this.set(key, defaults[key]);
             }
+        },
+
+        getScaleToSize: function(x, y, sizeX, sizeY) {
+            return {x: sizeX/x, y: sizeY/y};
         },
 
         getPastelColor: function() {
@@ -67,7 +63,6 @@ define(['backbone', 'worldProxy'], function(Backbone, worldProxy) {
         },
 
         select: function() {
-            console.log("selected");
             this.trigger('clicked', this);
         }
     });
@@ -77,9 +72,10 @@ define(['backbone', 'worldProxy'], function(Backbone, worldProxy) {
             this.setDefaults({
                 type: 'circle',
                 radius: 10,
-                fill: this.getPastelColor()
+                attr: {
+                    fill: this.getPastelColor()
+                }
             });
-            this.shapeAttrKeys = ['fill'];
         }
     });
 
@@ -89,20 +85,36 @@ define(['backbone', 'worldProxy'], function(Backbone, worldProxy) {
                 type: 'rect',
                 height: 20,
                 width: 20,
-                fill: this.getPastelColor()
+                attr: {
+                    fill: this.getPastelColor()
+                }
             });
-            this.shapeAttrKeys = ['fill'];
         }
     });
 
-    var ImageModel = ShapeModel.extend({
+    var SVGModel = ShapeModel.extend({
         initialize: function() {
             this.setDefaults({
-                type: 'image',
+                type: 'star',
                 height: 30,
-                width: 30
+                width: 30,
+                path: "M 29,7.441432952880859 34.30384063720703,22.699893951416016 50.4544677734375,23.02901840209961 37.581787109375,32.78839111328125 42.25959014892578,48.25025939941406 29,39.02342987060547 15.740406036376953,48.25025939941406 20.418212890625,32.78839111328125 7.545528411865234,23.02901840209961 23.696163177490234,22.699893951416016 29,7.441432952880859 34.30384063720703,22.699893951416016 z",
+                centerOffset: {
+                    x: -29,
+                    y: -27.8
+                },
+                attr:{
+                    "stroke-width": '5',
+                    stroke: '#000000',
+                    strokeWidth: '5',
+                    strokecolor: '#000000',
+                    fill: '#FF0000',
+                    orient: 'point',
+                    point: '5',
+                    shape: 'star',
+                    'stroke-opacity': '1'
+                }
             });
-            this.shapeAttrKeys = [];
         }
     });
 
@@ -118,7 +130,7 @@ define(['backbone', 'worldProxy'], function(Backbone, worldProxy) {
             for(var i=0; i<prevSelected.length; i++)
             {
                 prev = prevSelected[i];
-                if(prev.get('id') != model.get('id'))
+                if(prev.get('_id') != model.get('_id'))
                     prev.unset('isSelected');
             }
             model.set('isSelected', true);
@@ -130,7 +142,7 @@ define(['backbone', 'worldProxy'], function(Backbone, worldProxy) {
         ShapeModel: ShapeModel,
         CircleModel: CircleModel,
         RectangleModel: RectangleModel,
-        ImageModel: ImageModel,
+        SVGModel: SVGModel,
         ShapeCollection: ShapeCollection
     };
 });

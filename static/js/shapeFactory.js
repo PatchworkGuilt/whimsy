@@ -23,8 +23,8 @@ define(['backbone', 'views/ShapeViews'], function(Backbone, ShapeViews) {
                 return new ShapeViews.CircleView(data, paper);
             case 'rect':
                 return new ShapeViews.RectangleView(data, paper);
-            case 'owl':
-                return new ShapeViews.ImageView(data, paper);
+            case 'star':
+                return new ShapeViews.SVGView(data, paper);
             default:
                 console.error("Unknown shape: ", name);
         }

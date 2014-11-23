@@ -118,7 +118,7 @@ define(['backbone', 'worldProxy'], function(Backbone, worldProxy) {
         }
     });
 
-    var ShapeCollection = Backbone.Collection.extend({
+    var ShapesCollection = Backbone.Collection.extend({
         model: ShapeModel,
 
         initialize: function(){
@@ -143,6 +143,6 @@ define(['backbone', 'worldProxy'], function(Backbone, worldProxy) {
         CircleModel: CircleModel,
         RectangleModel: RectangleModel,
         SVGModel: SVGModel,
-        ShapeCollection: ShapeCollection
+        ShapesCollection: ShapesCollection
     };
 });

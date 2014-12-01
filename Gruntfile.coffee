@@ -32,11 +32,11 @@ module.exports = (grunt) =>
         watch:
             coffee:
                 files: 'static/coffee/**/*.coffee'
-                tasks: ['clean', 'copy', 'coffee']
+                tasks: ['clean', 'coffee', 'copy']
 
             js:
                 files: 'static/js/**/*.js'
-                tasks: ['clean', 'copy']
+                tasks: ['clean', 'coffee', 'copy']
 
 
 

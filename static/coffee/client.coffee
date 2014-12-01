@@ -16,15 +16,9 @@ requirejs.config
 
 
 require([
-    'raphael'
-    'jquery'
-    'stopwatch'
-    'worldProxy'
-    'shapeFactory'
-    'models/ShapeModels'
-    'views/views'
-    'models/models'
-], (Raphael, $, StopWatch, worldProxy, shapeFactory, ShapeModels, Views, Models) ->
+    'views/CanvasViews'
+    'models/CanvasModels'
+], (Views, Models) ->
     canvasView = new Views.CanvasView
         model: new Models.CanvasModel()
 )

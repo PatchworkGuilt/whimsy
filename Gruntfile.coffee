@@ -29,18 +29,24 @@ module.exports = (grunt) =>
                 dest: 'static/build/js/'
                 ext: '.js'
 
+        growl:
+            completedMessage:
+                message: "Whimsy build complete"
+                title: "Grunt Watcher"
+
         watch:
             coffee:
                 files: 'static/coffee/**/*.coffee'
-                tasks: ['clean', 'coffee', 'copy']
+                tasks: ['clean', 'coffee', 'copy', 'growl:completedMessage']
 
             js:
                 files: 'static/js/**/*.js'
-                tasks: ['clean', 'coffee', 'copy']
-
+                tasks: ['clean', 'coffee', 'copy', 'growl:completedMessage']
 
 
     grunt.loadNpmTasks 'grunt-contrib-copy'
     grunt.loadNpmTasks 'grunt-contrib-clean'
     grunt.loadNpmTasks 'grunt-contrib-coffee'
     grunt.loadNpmTasks 'grunt-contrib-watch'
+    grunt.loadNpmTasks 'grunt-growl'
+

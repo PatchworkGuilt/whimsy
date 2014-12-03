@@ -4,7 +4,7 @@ app = express()
 port = process.env.PORT || 3700
 
 requirejs.config
-    baseUrl: './static/js'
+    baseUrl: './static/build/js'
     nodeRequire: require
 
 app.set('views', __dirname + '/static/html')
@@ -35,23 +35,22 @@ requirejs ['World'], (World) ->
 
     io.sockets.on 'connection', (socket) ->
         console.log "connected"
-        @room_id = null
-        broadcast = (name, worldData) =>
-            console.log "Broadcasting to "+@room_id
-            if @room_id
-                io.to(@room_id).emit('broadcast', {name: name, data: worldData})
+        room_id = null
+        broadcast = (name, worldData) ->
+            if room_id
+                io.to(room_id).emit('broadcast', {name: name, data: worldData})
             else
                 socket.emit("InvalidStateError", "No Room_ID")
 
-        socket.on 'room', (id) =>
-            @room_id = id
-            socket.join(@room_id)
+        socket.on 'room', (id) ->
+            room_id = id
+            socket.join(room_id)
 
-            unless @room_id in rooms
-                rooms[@room_id] = new World(broadcast, @room_id)
-                console.log('created room', @room_id)
+            unless room_id of rooms
+                rooms[room_id] = new World(broadcast, room_id)
+                console.log('created room', room_id)
 
-            socket.room = rooms[@room_id]
+            socket.room = rooms[room_id]
 
             socket.emit('broadcast', {name: 'resetTo', data: JSON.stringify(socket.room.getBodies())})
 

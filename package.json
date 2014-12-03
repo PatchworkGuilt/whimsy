@@ -16,7 +16,7 @@
   },
   "author": "Scott Morse",
   "scripts": {
-    "start": "node server.js",
+    "start": "coffee server.coffee",
     "test": "mocha static/js/test/unit --reporter spec --recursive",
     "e2e_test": "casperjs test static/js/test/e2e"
   },

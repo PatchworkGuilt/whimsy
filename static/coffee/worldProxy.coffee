@@ -42,4 +42,5 @@ define ['socketio', 'backbone'], (socketio, Backbone) ->
                 console.log("Fuck.")
             return socket
 
-    return new WorldProxy()
+    proxy = proxy || new WorldProxy() #neccesary? Not sure. Doing it for safety. #SingletonShudder.
+    return proxy

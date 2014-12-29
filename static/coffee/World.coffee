@@ -28,8 +28,8 @@ define ['util/db'], (db) ->
         selectBody = (data) ->
             broadcast('select', JSON.stringify(data))
 
-        getBodies = =>
-            return bodies
+        getBodies = (callback) =>
+            db.getAllShapes roomId, callback
 
         return {
             emit: emit

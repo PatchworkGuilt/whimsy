@@ -52,7 +52,12 @@ requirejs ['World'], (World) ->
 
             socket.room = rooms[room_id]
 
-            socket.emit('broadcast', {name: 'resetTo', data: JSON.stringify(socket.room.getBodies())})
+            socket.room.getBodies (bodies) ->
+                console.log "BODIES: ", bodies
+                socket.emit 'broadcast', {
+                    name: 'resetTo'
+                    data: JSON.stringify(bodies)
+                }
 
         socket.on 'addBody', (data) ->
             console.log("addbody")

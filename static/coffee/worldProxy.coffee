@@ -33,7 +33,8 @@ define ['socketio', 'backbone'], (socketio, Backbone) ->
                 @broadcast(data.name, data.data)
             .on 'connect', =>
                 console.log("Joined ", @get('room_id'))
-                socket.emit('room', @get('room_id'))
+                if @get('room_id')
+                    socket.emit('room', @get('room_id'))
             .on 'disconnect', =>
                 console.log("What happen?")
             .on 'reconnecting', =>

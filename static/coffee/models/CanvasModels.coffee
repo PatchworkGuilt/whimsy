@@ -16,9 +16,11 @@ define ['backbone', 'worldProxy', 'models/UserModel'], (Backbone, WorldProxy, Us
 
         #Update the shape locally.  Should only be called as a result of a message from server
         _updateShape: (updates) ->
+            console.log "UPdates: ", updates
             shape = @shapesCollection.get(updates._id)
             if shape
                 #TODO: Validation
+                shape.clear()
                 shape.set(updates)
             else
                 console.error("COULDN'T FIND SHAPE: " + updates._id)
@@ -80,11 +82,7 @@ define ['backbone', 'worldProxy', 'models/UserModel'], (Backbone, WorldProxy, Us
 
         select: ->
             #unless @get('selectedBy') EVENTUALLY, once we actually have user models
-            @save('selectedBy', UserModel.get('id'))
             @trigger('clicked', this)
-
-        unselect: ->
-            @save('selectedBy', null)
 
         isSelectedByMe: ->
             return @get('selectedBy') == UserModel.get('id')
@@ -128,8 +126,10 @@ define ['backbone', 'worldProxy', 'models/UserModel'], (Backbone, WorldProxy, Us
             super options
 
         onClicked: (model) =>
-            @selectedModel?.unselect()
+            @selectedModel?.unset 'selectedBy'
+            @selectedModel?.save()
             @selectedModel = model
+            model.save('selectedBy', UserModel.get('id'))
 
 
     return {

@@ -1,7 +1,6 @@
-define ['backbone', 'raphael', 'models/CanvasModels'], (Backbone, Raphael, CanvasModels) ->
+define ['backbone', 'raphael', 'models/CanvasModels'], (Backbone, Raph, CanvasModels) ->
     class CanvasView extends Backbone.View
         initialize: ->
-            window.shapes = []
             @paper = Raphael 'viewport', '100%', '100%'
             @paper.width = $("#viewport").width()
             @paper.height = $("#viewport").height()
@@ -15,7 +14,6 @@ define ['backbone', 'raphael', 'models/CanvasModels'], (Backbone, Raphael, Canva
             @CELL_HEIGHT = 40
             @CELL_WIDTH = 40
             startPoint = {x: 0, y: @paper.height}
-
             for shape, index in ['star', 'star', 'star']
                 shapeOrigin =
                     x: startPoint.x + (@CELL_WIDTH * index)
@@ -23,7 +21,6 @@ define ['backbone', 'raphael', 'models/CanvasModels'], (Backbone, Raphael, Canva
                 @drawTool(shape, shapeOrigin.x, shapeOrigin.y)
 
         drawTool: (name, x, y) =>
-            console.log "DRAWTOOL"
             @paper.rect(x, y, @CELL_WIDTH, @CELL_HEIGHT)
                 .attr({fill: 'gray'})
                 .toBack()
@@ -35,7 +32,6 @@ define ['backbone', 'raphael', 'models/CanvasModels'], (Backbone, Raphael, Canva
                 paper: @paper
             })
             toolModel.on 'drag:end', =>
-                console.log "DRAGEND"
                 @model.queueNewShape toolModel
                 toolModel.setLocation startingLoc.x, startingLoc.y
 
@@ -44,8 +40,8 @@ define ['backbone', 'raphael', 'models/CanvasModels'], (Backbone, Raphael, Canva
             @paper = options.paper
             @render()
             @model.on "change", @render
+            @model.on "change:height change:width", @calculateScale
             @model.on "remove", @remove
-            window.shapes.push @
 
         addListeners: =>
             @addDrag()
@@ -70,23 +66,24 @@ define ['backbone', 'raphael', 'models/CanvasModels'], (Backbone, Raphael, Canva
             @selectedBox?.remove()
 
         render: =>
-            if @drawnShape
-                @updateShape()
-            else
+            unless @drawnShape
                 @drawNewShape()
                 @addListeners()
+            @updateShape()
             if @selectedBox
                 @selectedBox.remove()
                 @selectedBox = null
             if @model.isSelectedByMe()
                 @drawAsSelected()
             else if @model.isSelectedByOther()
+                console.log "UNavailable", @model.get('selectedBy')
                 @drawAsUnavailable()
             @drawnShape.toFront()
 
         updateShape: =>
-            json = @model.toJSON()
+            json = @model.get('attr')
             @drawnShape.attr(json)
+            @transformShape()
 
         drawNewShape: ->
             null
@@ -94,15 +91,15 @@ define ['backbone', 'raphael', 'models/CanvasModels'], (Backbone, Raphael, Canva
         addDrag: =>
             didDrag = false
             start = =>
-                console.log "Start"
+                console.log "Start #{@model.cid}"
                 @startX = @model.get('x')
                 @startY = @model.get('y')
             move = (dx,dy, x, y) =>
-                console.log "move"
+                console.log "move #{@model.cid}"
                 @model.setLocation(@startX + dx, @startY + dy)
                 didDrag = true
             stop = =>
-                console.log "stop"
+                console.log "stop #{@model.cid}"
                 if didDrag
                     didDrag = false
                     @model.trigger('drag:end')
@@ -116,12 +113,12 @@ define ['backbone', 'raphael', 'models/CanvasModels'], (Backbone, Raphael, Canva
     class SVGView extends ShapeView
 
         drawNewShape: =>
-            console.log "new shape"
             @drawnShape = @paper.path(@model.get("path")).attr(@model.get('attr'))
-            @updateScale()
-            @transformShape()
+            @calculateScale()
 
-        updateScale: =>
+        calculateScale: =>
+            unless @drawnShape
+                return
             bbox = @drawnShape.getBBox()
             width = @model.get('width')
             height = @model.get('height')

@@ -53,7 +53,6 @@ requirejs ['World'], (World) ->
             socket.room = rooms[room_id]
 
             socket.room.getBodies (bodies) ->
-                console.log "BODIES: ", bodies
                 socket.emit 'broadcast', {
                     name: 'resetTo'
                     data: JSON.stringify(bodies)

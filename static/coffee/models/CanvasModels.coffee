@@ -1,4 +1,4 @@
-define ['backbone', 'worldProxy', 'models/UserModel', 'util/library'], (Backbone, WorldProxy, UserModel, library) ->
+define ['backbone', 'worldProxy', 'models/UserModel'], (Backbone, WorldProxy, UserModel) ->
     class CanvasModel extends Backbone.Model
         initialize: (paper)->
             @shapesCollection = new ShapesCollection()
@@ -105,15 +105,6 @@ define ['backbone', 'worldProxy', 'models/UserModel', 'util/library'], (Backbone
 
         isSelectedByOther: ->
             return @get('selectedBy') && @get('selectedBy') != UserModel.get('id')
-
-        scaleAndRotate: (startPoint, dx, dy) ->
-            current = @getCurrentLocation()
-            endPoint =
-                x: startPoint.x + dx
-                y: startPoint.y + dy
-            distToStart = library.distanceBetween startPoint, current
-            distToEnd = library.distanceBetween endPoint, current
-            @scaleByRatio distToStart, distToEnd, true
 
     class SVGModel extends ShapeModel
         initialize: =>

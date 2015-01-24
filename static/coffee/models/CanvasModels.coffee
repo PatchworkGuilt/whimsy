@@ -16,7 +16,6 @@ define ['backbone', 'worldProxy', 'models/UserModel'], (Backbone, WorldProxy, Us
 
         #Update the shape locally.  Should only be called as a result of a message from server
         _updateShape: (updates) ->
-            console.log "UPdates: ", updates
             shape = @shapesCollection.get(updates._id)
             if shape
                 #TODO: Validation
@@ -66,19 +65,36 @@ define ['backbone', 'worldProxy', 'models/UserModel'], (Backbone, WorldProxy, Us
                 y: @get('y') + offset.y
             }
 
+        getCurrentSize: ->
+            currentScale = @get('scale') || {x: 1, y: 1}
+            currentSize =
+                x: @get('baseWidth') * currentScale.x
+                y: @get('baseHeight') * currentScale.y
+            return currentSize
+
         setDefaults: (defaults) ->
             for key of defaults
                 unless @has(key)
                     @set key, defaults[key]
 
-        getScaleToSize: (x, y, sizeX, sizeY) ->
-            return {x: sizeX / x, y: sizeY / y}
+        scaleToSize: (newSize, save) ->
+            baseSize =
+                x: @get('baseWidth')
+                y: @get('baseHeight')
 
-        getTopLeftCorner: ->
-            coord = {}
-            coord['x'] = @get('x') - (@get('width') / 2.0)
-            coord['y'] = @get('y') - (@get('height') / 2.0)
-            return coord
+            scale =
+                x: newSize.x / baseSize.x
+                y: newSize.y / baseSize.y
+            if save
+                @save 'scale', scale
+            else
+                @set 'scale', scale
+
+        scaleBySize: (newSize) ->
+            currentSize = @getCurrentSize()
+            @scaleToSize
+                x: currentSize.x + newSize.x
+                y: currentSize.y + newSize.y
 
         select: ->
             #unless @get('selectedBy') EVENTUALLY, once we actually have user models
@@ -94,8 +110,8 @@ define ['backbone', 'worldProxy', 'models/UserModel'], (Backbone, WorldProxy, Us
         initialize: =>
             @setDefaults
                 type: 'star',
-                height: 30,
-                width: 30,
+                baseHeight: 44.88970909118653,
+                baseWidth: 47.1998332977295,
                 path: "M 29,7.441432952880859 34.30384063720703,22.699893951416016 50.4544677734375,23.02901840209961 37.581787109375,32.78839111328125 42.25959014892578,48.25025939941406 29,39.02342987060547 15.740406036376953,48.25025939941406 20.418212890625,32.78839111328125 7.545528411865234,23.02901840209961 23.696163177490234,22.699893951416016 29,7.441432952880859 34.30384063720703,22.699893951416016 z",
                 centerOffset: {
                     x: -29,
@@ -117,7 +133,7 @@ define ['backbone', 'worldProxy', 'models/UserModel'], (Backbone, WorldProxy, Us
         model: ShapeModel
 
         initialize: ->
-            @on('clicked', @onClicked)
+            @on 'clicked', @onClicked
             @selectedModel = null
 
         reset: (options) ->
@@ -131,11 +147,18 @@ define ['backbone', 'worldProxy', 'models/UserModel'], (Backbone, WorldProxy, Us
             @selectedModel = model
             model.save('selectedBy', UserModel.get('id'))
 
+    class SelectedShapesCollection extends Backbone.Collection
+        model: ShapeModel
+
+        initialize: ->
+            @on 'add', (model)
+
 
     return {
         CanvasModel: CanvasModel
         ShapeModel: ShapeModel
         SVGModel: SVGModel
         ShapesCollection: ShapesCollection
+        SelectedShapesCollection: SelectedShapesCollection
     }
 

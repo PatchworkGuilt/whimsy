@@ -59,11 +59,9 @@ requirejs ['World'], (World) ->
                 }
 
         socket.on 'addBody', (data) ->
-            console.log("addbody")
             socket.room.emit('addBody', data)
 
         socket.on 'updateBody', (data) ->
-            console.log("updatebody")
             socket.room.emit('updateBody', data)
 
         socket.on 'disconnect', ->

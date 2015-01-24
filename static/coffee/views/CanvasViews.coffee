@@ -1,14 +1,30 @@
-define ['backbone', 'raphael', 'models/CanvasModels'], (Backbone, Raph, CanvasModels) ->
+define ['backbone', 'raphael', 'models/CanvasModels'], (Backbone, Raphael, CanvasModels) ->
     class CanvasView extends Backbone.View
         initialize: ->
             @paper = Raphael 'viewport', '100%', '100%'
             @paper.width = $("#viewport").width()
             @paper.height = $("#viewport").height()
             @model.shapesCollection.on 'add', (shape) =>
-                view = new SVGView
-                    model: shape
-                    paper: @paper
+                @addNewShape shape
+            @selectedFrameView = new SelectedFrameView
+                paper: @paper
             @render()
+
+        addNewShape: (shapeModel)=>
+            shapeView = new SVGView
+                model: shapeModel
+                paper: @paper
+            window.shape = shapeView
+
+            paper = @paper
+            shapeModel.on 'change:selectedBy', =>
+                @selectedFrameView?.detach()
+                if shapeModel.isSelectedByMe()
+                    @selectedFrameView.attachTo(shapeView)
+                else if shapeModel.isSelectedByOther()
+                    @frameView = new UnavailableFrameView
+                        paper: paper
+                        shape: shapeView
 
         render: ->
             @CELL_HEIGHT = 40
@@ -31,6 +47,8 @@ define ['backbone', 'raphael', 'models/CanvasModels'], (Backbone, Raph, CanvasMo
                 model: toolModel
                 paper: @paper
             })
+            toolModel.scaleToSize({x: @CELL_WIDTH, y: @CELL_HEIGHT})
+
             toolModel.on 'drag:end', =>
                 @model.queueNewShape toolModel
                 toolModel.setLocation startingLoc.x, startingLoc.y
@@ -40,44 +58,21 @@ define ['backbone', 'raphael', 'models/CanvasModels'], (Backbone, Raph, CanvasMo
             @paper = options.paper
             @render()
             @model.on "change", @render
-            @model.on "change:height change:width", @calculateScale
             @model.on "remove", @remove
 
         addListeners: =>
             @addDrag()
             @addClick()
 
-        drawAsSelected: =>
-            bbox = @drawnShape.getBBox()
-            rect = @paper.rect(bbox.x, bbox.y, bbox.width, bbox.height)
-            rect.attr
-                stroke: 'blue'
-            @selectedBox = rect
-
-        drawAsUnavailable: =>
-            bbox = @drawnShape.getBBox()
-            rect = @paper.rect(bbox.x, bbox.y, bbox.width, bbox.height)
-            rect.attr
-                stroke: 'red'
-            @selectedBox = rect
-
         remove: =>
             @drawnShape?.remove()
-            @selectedBox?.remove()
+            @frameView?.remove()
 
         render: =>
             unless @drawnShape
                 @drawNewShape()
                 @addListeners()
             @updateShape()
-            if @selectedBox
-                @selectedBox.remove()
-                @selectedBox = null
-            if @model.isSelectedByMe()
-                @drawAsSelected()
-            else if @model.isSelectedByOther()
-                console.log "UNavailable", @model.get('selectedBy')
-                @drawAsUnavailable()
             @drawnShape.toFront()
 
         updateShape: =>
@@ -91,15 +86,12 @@ define ['backbone', 'raphael', 'models/CanvasModels'], (Backbone, Raph, CanvasMo
         addDrag: =>
             didDrag = false
             start = =>
-                console.log "Start #{@model.cid}"
                 @startX = @model.get('x')
                 @startY = @model.get('y')
             move = (dx,dy, x, y) =>
-                console.log "move #{@model.cid}"
                 @model.setLocation(@startX + dx, @startY + dy)
                 didDrag = true
             stop = =>
-                console.log "stop #{@model.cid}"
                 if didDrag
                     didDrag = false
                     @model.trigger('drag:end')
@@ -111,24 +103,94 @@ define ['backbone', 'raphael', 'models/CanvasModels'], (Backbone, Raph, CanvasMo
                 @
 
     class SVGView extends ShapeView
-
         drawNewShape: =>
             @drawnShape = @paper.path(@model.get("path")).attr(@model.get('attr'))
-            @calculateScale()
-
-        calculateScale: =>
-            unless @drawnShape
-                return
-            bbox = @drawnShape.getBBox()
-            width = @model.get('width')
-            height = @model.get('height')
-            scale = {x: width / bbox.width, y: height / bbox.height}
-            @model.set('scale', scale, {'silent': true})
 
         transformShape: =>
-            scale = @model.get('scale')
+            scale = @model.get('scale') || {x: 1, y: 1}
             loc = @model.getCurrentLocation()
             path = @drawnShape.transform("s#{scale.x},#{scale.y}T#{loc.x},#{loc.y}")
+
+    class ShapeFrameView extends Backbone.View
+        initialize: (options) =>
+            @paper = options.paper
+
+        remove: ->
+            @frame?.remove()
+
+        attachTo: (shape)=>
+            @shape = shape
+            shape.model.on 'change', @render
+
+        detach: ->
+            @frame?.hide()
+
+        calculateBorder: (shape)->
+            bbox = shape.drawnShape.getBBox()
+            PADDING = 5
+            return {
+                x: bbox.x - PADDING
+                y: bbox.y - PADDING
+                width: bbox.width + (2 * PADDING)
+                height: bbox.height + (2 * PADDING)
+            }
+
+        render: =>
+            border = @calculateBorder(@shape)
+            @frame?.remove()
+            @frame = @paper.rect(border.x, border.y, border.width, border.height)
+            @frame.attr
+                stroke: @color
+
+    class SelectedFrameView extends ShapeFrameView
+        initialize: (options) =>
+            super(options)
+            @color = 'blue'
+
+        remove: ->
+            super()
+            @gripPoint?.remove()
+
+        detach: ->
+            super()
+            @gripPoint?.hide()
+            @stopListening()
+
+        render: =>
+            super()
+            border = @calculateBorder(@shape)
+            BRCorner =
+                x: border.x + border.width
+                y: border.y + border.height
+            @startPoint = @startPoint ||
+                x: BRCorner.x
+                y: BRCorner.y
+            if @gripPoint
+                @gripPoint.show()
+                @gripPoint.transform "T#{BRCorner.x - @startPoint.x},#{BRCorner.y - @startPoint.y}"
+            else
+                @gripPoint = @paper.circle BRCorner.x, BRCorner.y, 5
+                @gripPoint.attr
+                    fill: 'lightgray'
+                    stroke: 'black'
+                start = =>
+                    @startPoint =
+                        x: BRCorner.x
+                        y: BRCorner.y
+                    @startSize = @shape.model.getCurrentSize()
+                move = (dx,dy, x, y) =>
+                    newSize =
+                        x: @startSize.x + (2 * dx)
+                        y: @startSize.y + (2 * dy)
+                    @shape.model.scaleToSize(newSize, true)
+                end = =>
+                    return
+                @gripPoint.drag(move, start, end)
+
+    class UnavailableFrameView extends ShapeFrameView
+        initialize: (options) =>
+            super(options)
+            @color = 'red'
 
     return {
         CanvasView: CanvasView

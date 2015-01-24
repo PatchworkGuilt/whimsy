@@ -26,6 +26,10 @@ define ['mongoose'], (mongoose) ->
         x: Number
         y: Number
         selectedBy: String
+        scale: {
+            x: Number
+            y: Number
+        }
 
     roomSchema = mongoose.Schema
         shapes: [shapeSchema]

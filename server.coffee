@@ -63,7 +63,7 @@ requirejs ['World'], (World) ->
             socket.room.emit('addBody', data)
 
         socket.on 'updateBody', (data) ->
-            console.log("updatebody")
+            console.log("updatebody", data)
             socket.room.emit('updateBody', data)
 
         socket.on 'disconnect', ->

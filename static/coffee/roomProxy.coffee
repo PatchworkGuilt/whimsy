@@ -1,15 +1,15 @@
 define ['socketio', 'backbone'], (socketio, Backbone) ->
-    class WorldProxy extends Backbone.Model
+    class RoomProxy extends Backbone.Model
         initialize: ->
             @runOnServer()
             @set 'serverURL', if window then window.location.host else undefined
             @set 'room_id', if window then window.location.pathname.split("/")[1] else undefined
 
         runLocally: ->
-            define ['World'], (World) ->
+            define ['Room'], (Room) ->
                 if @proxy?.removeListener
                     @proxy.removeListener("render")
-                @proxy = new World(@broadcast)
+                @proxy = new Room(@broadcast)
 
         broadcast: (command, data) ->
             @trigger 'broadcastReceived', command, data
@@ -43,5 +43,5 @@ define ['socketio', 'backbone'], (socketio, Backbone) ->
                 console.log("Fuck.")
             return socket
 
-    proxy = proxy || new WorldProxy() #neccesary? Not sure. Doing it for safety. #SingletonShudder.
+    proxy = proxy || new RoomProxy() #neccesary? Not sure. Doing it for safety. #SingletonShudder.
     return proxy

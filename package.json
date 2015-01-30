@@ -3,11 +3,9 @@
   "version": "0.0.0",
   "description": "Collaborative Playground",
   "dependencies": {
-    "PhysicsJS": "git://github.com/wellcaffeinated/PhysicsJS.git",
     "amdefine": "latest",
     "ejs": "^1.0.0",
     "express": "latest",
-    "jade": "latest",
     "mongodb": "^1.4.8",
     "mongoose": "^3.8.17",
     "requirejs": "latest",

@@ -29,16 +29,16 @@ app.get "/", (req, res) ->
 app.use(express.static(__dirname + '/static/'))
 
 
-requirejs ['World'], (World) ->
+requirejs ['Room'], (Room) ->
     io = require('socket.io').listen(app.listen(port))
     rooms = {}
 
     io.sockets.on 'connection', (socket) ->
         console.log "connected"
         room_id = null
-        broadcast = (name, worldData) ->
+        broadcast = (name, roomData) ->
             if room_id
-                io.to(room_id).emit('broadcast', {name: name, data: worldData})
+                io.to(room_id).emit('broadcast', {name: name, data: roomData})
             else
                 socket.emit("InvalidStateError", "No Room_ID")
 
@@ -47,7 +47,7 @@ requirejs ['World'], (World) ->
             socket.join(room_id)
 
             unless room_id of rooms
-                rooms[room_id] = new World(broadcast, room_id)
+                rooms[room_id] = new Room(broadcast, room_id)
                 console.log('created room', room_id)
 
             socket.room = rooms[room_id]

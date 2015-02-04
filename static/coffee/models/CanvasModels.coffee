@@ -1,8 +1,8 @@
-define ['backbone', 'worldProxy', 'models/UserModel'], (Backbone, WorldProxy, UserModel) ->
+define ['backbone', 'roomProxy', 'models/UserModel'], (Backbone, RoomProxy, UserModel) ->
     class CanvasModel extends Backbone.Model
         initialize: (paper)->
             @shapesCollection = new ShapesCollection()
-            WorldProxy.on 'broadcastReceived', @onBroadcastReceived
+            RoomProxy.on 'broadcastReceived', @onBroadcastReceived
 
         onBroadcastReceived: (command, data) =>
             data = JSON.parse(data)
@@ -30,9 +30,9 @@ define ['backbone', 'worldProxy', 'models/UserModel'], (Backbone, WorldProxy, Us
             @shapesCollection.add(model)
 
         #Clear all shapes and add all passed shapes. Should only be called as a result of a message from server
-        _resetTo: (worldBodies) ->
+        _resetTo: (bodies) ->
             @shapesCollection.reset()
-            for body in worldBodies
+            for body in bodies
                 @_addShape body
 
     class ShapeModel extends Backbone.Model
@@ -42,9 +42,9 @@ define ['backbone', 'worldProxy', 'models/UserModel'], (Backbone, WorldProxy, Us
             switch(method)
                 when 'update'
                     unless model.doNotSync
-                        WorldProxy.update(model.toJSON())
+                        RoomProxy.update(model.toJSON())
                 when 'create'
-                    WorldProxy.add(model.toJSON())
+                    RoomProxy.add(model.toJSON())
                 else
                     Backbone.sync.call(method, model, options)
 

@@ -3,11 +3,9 @@
   "version": "0.0.0",
   "description": "Collaborative Playground",
   "dependencies": {
-    "PhysicsJS": "git://github.com/wellcaffeinated/PhysicsJS.git",
     "amdefine": "latest",
     "ejs": "^1.0.0",
     "express": "latest",
-    "jade": "latest",
     "mongodb": "^1.4.8",
     "mongoose": "^3.8.17",
     "requirejs": "latest",
@@ -23,7 +21,7 @@
   "main": "server.js",
   "devDependencies": {
     "casperjs": "^1.1.0-beta3",
-    "chai": "^1.9.1",
+    "chai": "^1.10.0",
     "coffee-script": "^1.8.0",
     "grunt": "^0.4.5",
     "grunt-contrib-clean": "^0.6.0",
@@ -32,7 +30,8 @@
     "grunt-contrib-watch": "^0.6.1",
     "grunt-growl": "^0.1.5",
     "mocha": "^1.19.0",
-    "phantomjs": "^1.9.7-8"
+    "phantomjs": "^1.9.7-8",
+    "squirejs": "^0.2.1"
   },
   "repository": {
     "type": "git",

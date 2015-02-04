@@ -7,14 +7,18 @@ requirejs.config
     baseUrl: './static/build/js'
     nodeRequire: require
 
+args = process.argv.slice(2)
+if args.indexOf('TEST_MODE') > -1
+    global.TEST_MODE = true
+
 app.set('views', __dirname + '/static/html')
 app.engine('html', require('ejs').renderFile)
 app.post "/create_new_room", (req, res) ->
     requirejs ['util/db'], (db) ->
         room = db.createRoom()
-        res.redirect("/" + room['_id'])
+        res.redirect("/room/" + room['_id'])
 
-app.get "/:room_id", (req, res) ->
+app.get "/room/:room_id", (req, res) ->
     requirejs ['util/db'], (db) ->
         db.getRoom req.params.room_id, (err, room) ->
             if room
@@ -26,10 +30,15 @@ app.get "/", (req, res) ->
     #Eventually, this will be a landing page.
     res.render "index.html"
 
+if global.TEST_MODE
+    app.get '/run_tests', (req, res) ->
+        res.render "test-index.html"
+
+    app.use('/node_modules', express.static(__dirname + '/node_modules/'))
 app.use(express.static(__dirname + '/static/'))
 
 
-requirejs ['Room'], (Room) ->
+requirejs ['Room', 'util/db'], (Room, db) ->
     io = require('socket.io').listen(app.listen(port))
     rooms = {}
 
@@ -47,7 +56,7 @@ requirejs ['Room'], (Room) ->
             socket.join(room_id)
 
             unless room_id of rooms
-                rooms[room_id] = new Room(broadcast, room_id)
+                rooms[room_id] = new Room(broadcast, room_id, db)
                 console.log('created room', room_id)
 
             socket.room = rooms[room_id]

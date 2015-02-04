@@ -3,7 +3,7 @@ define ['socketio', 'backbone'], (socketio, Backbone) ->
         initialize: ->
             @runOnServer()
             @set 'serverURL', if window then window.location.host else undefined
-            @set 'room_id', if window then window.location.pathname.split("/")[1] else undefined
+            @set 'room_id', if window then window.location.pathname.split("/room/")[1] else undefined
 
         runLocally: ->
             define ['Room'], (Room) ->
@@ -22,9 +22,6 @@ define ['socketio', 'backbone'], (socketio, Backbone) ->
 
         update: (data) ->
             @proxy.emit("updateBody", data)
-
-        select: (id) ->
-            @proxy.emit("selectBody", id)
 
         initSocket: ->
             socket = socketio.connect @get('serverURL')

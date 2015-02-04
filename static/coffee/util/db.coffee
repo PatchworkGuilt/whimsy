@@ -63,7 +63,7 @@ define ['mongoose'], (mongoose) ->
             Room.findById roomId, (err, room) ->
                 if (err)
                     console.log "ERROR getting shapes from room " + roomId
-                callback room.shapes
+                callback room?.shapes
 
         createRoom: ->
             room = new Room()

@@ -29,6 +29,12 @@ module.exports = (grunt) =>
                 dest: 'static/build/js/'
                 ext: '.js'
 
+        concat:
+            test_file:
+                src: ['static/build/js/test/unit/*.js']
+                dest: 'static/build/js/test/unit/build/allTests.js'
+                nonull: true
+
         growl:
             completedMessage:
                 message: "Whimsy build complete"
@@ -43,8 +49,13 @@ module.exports = (grunt) =>
                 files: 'static/js/**/*.js'
                 tasks: ['clean', 'coffee', 'copy', 'growl:completedMessage']
 
+            test:
+                files: 'static/build/js/test/unit/*.js'
+                tasks: ['concat:test_file']
+
 
     grunt.loadNpmTasks 'grunt-contrib-copy'
+    grunt.loadNpmTasks 'grunt-contrib-concat'
     grunt.loadNpmTasks 'grunt-contrib-clean'
     grunt.loadNpmTasks 'grunt-contrib-coffee'
     grunt.loadNpmTasks 'grunt-contrib-watch'

@@ -4,34 +4,40 @@
   "description": "Collaborative Playground",
   "dependencies": {
     "amdefine": "latest",
+    "backbone": "^1.1.2",
     "ejs": "^1.0.0",
     "express": "latest",
+    "jquery": "^2.1.3",
     "mongodb": "^1.4.8",
     "mongoose": "^3.8.17",
+    "raphael": "^2.1.4",
     "requirejs": "latest",
     "socket.io": "latest",
-    "underscore": "^1.6.0"
+    "underscore": "^1.8.2"
   },
   "author": "Scott Morse",
   "scripts": {
     "start": "coffee server.coffee",
-    "test": "mocha static/js/test/unit --reporter spec --recursive",
+    "test": "mocha static/build/js/test/unit --reporter spec --recursive",
     "e2e_test": "casperjs test static/js/test/e2e"
   },
   "main": "server.js",
   "devDependencies": {
+    "browserify": "^9.0.3",
     "casperjs": "^1.1.0-beta3",
     "chai": "^1.10.0",
     "coffee-script": "^1.8.0",
     "grunt": "^0.4.5",
+    "grunt-browserify": "^3.5.0",
     "grunt-contrib-clean": "^0.6.0",
     "grunt-contrib-coffee": "^0.12.0",
     "grunt-contrib-copy": "^0.7.0",
     "grunt-contrib-watch": "^0.6.1",
     "grunt-growl": "^0.1.5",
     "mocha": "^1.19.0",
+    "mockery": "^1.4.0",
     "phantomjs": "^1.9.7-8",
-    "squirejs": "^0.2.1"
+    "sinon": "^1.13.0",
   },
   "repository": {
     "type": "git",

@@ -38,7 +38,6 @@
     "mockery": "^1.4.0",
     "phantomjs": "^1.9.7-8",
     "sinon": "^1.13.0",
-    "squirejs": "^0.2.1"
   },
   "repository": {
     "type": "git",

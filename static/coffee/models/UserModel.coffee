@@ -1,7 +1,7 @@
-define ['backbone'], (Backbone) ->
-    class UserModel extends Backbone.Model
-        initialize: ->
-            @set 'id', "UserId" + Math.round (Math.random() * 100)
-            console.log @get('id')
+Backbone = require('backbone')
 
-    return new UserModel()
+class UserModel extends Backbone.Model
+    initialize: ->
+        @set 'id', "UserId" + Math.round (Math.random() * 100)
+
+module.exports = new UserModel()

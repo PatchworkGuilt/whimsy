@@ -29,12 +29,6 @@ module.exports = (grunt) =>
                 dest: 'static/build/js/'
                 ext: '.js'
 
-        concat:
-            test_file:
-                src: ['static/build/js/test/unit/*.js']
-                dest: 'static/build/js/test/unit/build/allTests.js'
-                nonull: true
-
         growl:
             completedMessage:
                 message: "Whimsy build complete"
@@ -43,21 +37,23 @@ module.exports = (grunt) =>
         watch:
             coffee:
                 files: 'static/coffee/**/*.coffee'
-                tasks: ['clean', 'coffee', 'copy', 'growl:completedMessage']
+                tasks: ['build']
 
             js:
                 files: 'static/js/**/*.js'
-                tasks: ['clean', 'coffee', 'copy', 'growl:completedMessage']
+                tasks: ['build']
 
-            test:
-                files: 'static/build/js/test/unit/*.js'
-                tasks: ['concat:test_file']
+        browserify:
+            client:
+                src: "static/build/js/client.js"
+                dest: "static/build/js/modules/client.js"
 
 
+    grunt.registerTask('build', ['clean', 'coffee', 'copy', 'browserify', 'growl:completedMessage'])
     grunt.loadNpmTasks 'grunt-contrib-copy'
-    grunt.loadNpmTasks 'grunt-contrib-concat'
     grunt.loadNpmTasks 'grunt-contrib-clean'
     grunt.loadNpmTasks 'grunt-contrib-coffee'
     grunt.loadNpmTasks 'grunt-contrib-watch'
+    grunt.loadNpmTasks('grunt-browserify');
     grunt.loadNpmTasks 'grunt-growl'
 
